@@ -1,0 +1,71 @@
+.carousal {
+    width: 100dvw;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 10;
+}
+
+.women-section {
+    background-image: url('/images/women.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 50dvw;
+    height: 380px;
+    position: relative;
+
+}
+
+.wuser-section {
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 30px;
+
+    p {
+        font-size: large;
+
+    }
+}
+
+.men-section {
+    background-image: url('/images/men.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 50dvw;
+    height: 380px;
+    position: relative;
+
+}
+
+.muser-section {
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 20px;
+    top: 30px;
+
+
+    p {
+        font-size: large;
+
+    }
+
+}
+
+.slogan {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 50px;
+    font-family: monospace;
+
+}

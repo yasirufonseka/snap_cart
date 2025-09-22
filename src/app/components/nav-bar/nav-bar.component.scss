@@ -1,0 +1,45 @@
+.navBar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+
+}
+
+
+input::placeholder {
+    font-weight: 100;
+
+}
+
+.input {
+
+    position: relative;
+}
+
+.svg {
+    position: absolute;
+    z-index: 2;
+    left: 20px;
+    top: 1px;
+}
+
+.nav-bottom {
+    background-color: rgba(255, 255, 255, 0.563);
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.user-action {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    align-items: center;
+}
