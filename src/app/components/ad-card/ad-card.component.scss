@@ -1,0 +1,68 @@
+.ad-card{
+    width: 90%;
+    height: 300px;
+    display:flex;
+    flex-direction: row;
+    overflow-x: scroll;
+    scroll-behavior: smooth;
+    anchor-name: --imageSlider;
+    scroll-snap-type: x  mandatory;
+    
+}
+.ad-card::-webkit-scrollbar{
+    display: none;
+}
+
+.ad-card::scroll-button(right){
+    content: '→';
+    border: solid 2px rgb(255, 255, 255);
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: fixed;
+    position-anchor: --imageSlider;
+    position-area: right center;
+    translate: -145%;
+    
+}
+
+.ad-card::scroll-button(left){
+    content: '←';
+    border: solid 2px rgb(255, 255, 255);
+    background-color: transparent;
+    color: rgb(255, 255, 255);
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    position: fixed;
+    position-anchor: --imageSlider;
+    position-area: left center;
+     translate: 130%;
+}
+
+.adImg{
+    background-image: url(/images/card-1.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height:300px
+
+}
+.content{
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: baseline;
+    padding: 88px;
+    scroll-snap-align: start;
+    background-color: #123828;
+    
+}
+.btn{
+    width:144px;
+}
