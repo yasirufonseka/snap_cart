@@ -1,94 +1,68 @@
 <section>
-    <div class=" bg-secondary-subtle mt-5  p-5 ">
-        <div class=" text-start">
-            <h2 class="fs-2 fw-bold">Shop by style</h2>
-        </div>
-        <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-            <div class="col" *ngFor="let product of products">
-                <div class="card h-100">
-                    <img src="{{ product.imgUrl }}" class="card-img-top p-4" alt="image">
-                    <div class="card-body">
-                        <h5 class="card-title">{{product.title}}</h5>
-                        <p class="card-text">{{ product.price }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="container">
+        <h1 class="fs-2">{{Category_Name}}</h1>
+        <p>{{search_result}}</p>
+    </div>
+
+    <div class="container d-flex flex-row align-items-center gap-3">
+        <p class="fs-3">Popular brands :</p>
+        <p class="fs-5">{{Popular_brands}}</p>
+        
+    </div>
+    <div class="container">
+        <app-product-showcase></app-product-showcase>
     </div>
 </section>
-<!--Popular this week  -->
 <section>
-    <div class=" mt-5 p-5 rounded-3">
-        <div class=" text-start">
-            <h2 class="fs-2 fw-bold">Popular this week</h2>
+    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content p-3">
+      <div class="modal-body d-flex flex-column flex-md-row">
+        
+        <!-- Product Image -->
+        <div class="col-md-6 text-center ">
+          <img src="/images/Zara-t-shrit.jpg" alt="Zara T-shirt" class="img-fluid h-100 w-100 img-contain rounded mb-3">
+          <div>
+            <i class="bi bi-heart"></i>
+          </div>
         </div>
-        <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
-            <div class="col" *ngFor="let product of products">
-                <div class="card h-100">
-                    <img src="{{ product.imgUrl }}" class="card-img-top p-4" alt="image">
-                    <div class="card-body">
-                        <h5 class="card-title">{{product.title}}</h5>
-                        <p class="card-text">{{ product.price }}</p>
-                    </div>
-                </div>
-            </div>
+
+        <!-- Product Details -->
+        <div class="col-md-6 ps-3">
+          <h5 class="fw-bold">Zara Black T-shirt</h5>
+          <p><span class="fw-bold">Rs. 4000</span> <span class="badge bg-danger ms-2">40% Off</span></p>
+          <p><strong>Size:</strong> L, XL</p>
+          <p><strong>Serial No:</strong> 1458905347</p>
+          <p><strong>Color:</strong> Black</p>
+          <p><strong>Condition:</strong> Excellent</p>
+
+          <div class="d-grid gap-2 my-3">
+            <button class="btn btn-warning">Buy Now</button>
+            <button class="btn btn-outline-dark">Add to Cart</button>
+          </div>
+
+          <small class="text-muted">All purchases through Snap Cart covered by Buyer Protection.</small>
         </div>
+      </div>
+
+      <!-- Recent Reviews -->
+      <div class="mt-4">
+        <h6>Recent Reviews</h6>
+        <div class="card mb-2 p-2">
+          <div class="d-flex align-items-center">
+            <img src="assets/user1.jpg" alt="user" class="rounded-circle me-2" width="40" height="40">
+            <p class="mb-0"><strong>Lucas Johnson:</strong> The seller was so patient and communication was perfect. Seller was great!</p>
+          </div>
+        </div>
+        <div class="card p-2">
+          <div class="d-flex align-items-center">
+            <img src="assets/user2.jpg" alt="user" class="rounded-circle me-2" width="40" height="40">
+            <p class="mb-0"><strong>Tyler Smith:</strong> Seller is very friendly, excellent product!</p>
+          </div>
+        </div>
+      </div>
     </div>
-</section>
-<!--Sort by price  -->
-<section>
-    <div class="bg-secondary-subtle mt-5 p-5 ">
+  </div>
+</div>
 
-        <div class=" text-start">
-            <h2 class="fs-2 fw-bold">Sort by price</h2>
-        </div>
-        <div class="container d-flex flex-row rounded-3 p-4  align-item-center justify-content-evenly">
-            <div class="cards  align-self-center p-4 text-center rounded-3 " style="width: 15rem;">
-                <p class="fs-2">Under <span class="fw-bold">$10</span></p>
-
-            </div>
-            <div class="cards  align-self-center p-4 text-center  " style="width: 15rem;">
-                <p class="fs-2">Under <span class="fw-bold">$20</span></p>
-
-            </div>
-            <div class="cards  align-self-center p-4 text-center  " style="width: 15rem;">
-                <p class="fs-2">Under <span class="fw-bold">$50</span></p>
-
-            </div>
-            <div class="cards  align-self-center p-4 text-center  " style="width: 15rem;">
-                <p class="fs-2">Under <span class="fw-bold">$100</span></p>
-
-            </div>
-        </div>
-    </div>
-
-</section>
-<section class="p-5">
-    <p class="fs-2 fw-bold ms-3 mt-3 ">Snap Cart Edits</p>
-      <p class="fs-5 ms-3 m">Items we love, updated daily</p>
-    <div class="continer m-2 p-2">
-        <div class="row">
-            <div class="col-6 h-25  ">
-                <div class="row p-2">
-                    <div class="col-4"><img src="/images/women.jpg" alt="" srcset=""></div>
-                    <div class="col-4"><img src="/images/women.jpg" alt="" srcset=""></div>
-                    <div class="col-4"><img src="/images/women.jpg" alt="" srcset=""></div>
-                </div>
-                <div class="row p-2">
-                    <div class="col-4"><img src="/images/women.jpg" alt="" srcset=""></div>
-                    <div class="col-4"><img src="/images/women.jpg" alt="" srcset=""></div>
-                    <div class="col-4"><img src="/images/women.jpg" alt="" srcset=""></div>
-                </div>
-                <div class="row p-2">
-                    <div class="col-4"><img src="/images/women.jpg" alt="" srcset=""></div>
-                    <div class="col-4"><img src="/images/women.jpg" alt="" srcset=""></div>
-                    <div class="col-4"><img src="/images/women.jpg" alt="" srcset=""></div>
-                </div>
-            </div>
-            <div class="col-6 h-25">
-                <div class="row"><img src="/images/women.jpg" alt="" srcset=""></div>
-            </div>
-        </div>
-
-    </div>
-</section>
+    

@@ -1,0 +1,20 @@
+.photo-box {
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+}
+.photo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.photo-box input {
+  display: none;
+}
