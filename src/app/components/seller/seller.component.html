@@ -1,0 +1,118 @@
+<section>
+    <form action="" method="post">
+
+        <div class="container my-5 ">
+  <div class="card shadow p-5">
+    <h4 class="mb-4">Create Listing</h4>
+
+    <!-- Photos Section -->
+    <div class="mb-4">
+      <label class="form-label fw-bold">Photos</label>
+      <div class="row g-3">
+        <div class="col-6 col-md-4 col-lg-2" *ngFor="let photo of photos; let i = index">
+          <div class="photo-box" (click)="selectPhoto(i)">
+            <span *ngIf="!photo.preview">{{ photo.label }}</span>
+            <img *ngIf="photo.preview" [src]="photo.preview" class="img-fluid" />
+            <input type="file" accept="image/*" (change)="onFileChange($event, i)" hidden #fileInput>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-4">
+      <label class="form-label fw-bold">Description</label>
+      <textarea class="form-control" rows="3" placeholder="Write about your item..."
+                [(ngModel)]="form.description" name="description"></textarea>
+    </div>
+
+    <!-- Info Section -->
+    <h5 class="fw-bold mb-3">Info</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label">Category</label>
+        <select class="form-select" [(ngModel)]="form.category" name="category">
+          <option>Select category...</option>
+          <option>Clothes</option>
+          <option>Electronics</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Condition</label>
+        <select class="form-select" [(ngModel)]="form.condition" name="condition">
+          <option>New</option>
+          <option>Used</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Brand</label>
+        <input type="text" class="form-control" placeholder="Enter brand"
+               [(ngModel)]="form.brand" name="brand">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Serial No</label>
+        <input type="text" class="form-control" placeholder="Enter serial number"
+               [(ngModel)]="form.serialNo" name="serialNo">
+      </div>
+    </div>
+
+    <!-- Enhance Your Listing -->
+    <h5 class="fw-bold mb-3">Enhance your listing</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label">Colour</label>
+        <input type="text" class="form-control" placeholder="Enter colour"
+               [(ngModel)]="form.colour" name="colour">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Size</label>
+        <select class="form-select" [(ngModel)]="form.size" name="size">
+          <option>Small</option>
+          <option>Medium</option>
+          <option>Large</option>
+          <option>Extra Large</option>
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Age</label>
+        <input type="number" class="form-control" placeholder="Enter age"
+               [(ngModel)]="form.age" name="age">
+      </div>
+    </div>
+
+    <!-- Location -->
+    <h5 class="fw-bold mb-3">Location</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label">City</label>
+        <input type="text" class="form-control" placeholder="Enter city"
+               [(ngModel)]="form.city" name="city">
+      </div>
+    </div>
+
+    <!-- Price Section -->
+    <h5 class="fw-bold mb-3">Price</h5>
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <label class="form-label">Price</label>
+        <input type="number" class="form-control" placeholder="Enter price"
+               [(ngModel)]="form.price" name="price">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Discount</label>
+        <input type="number" class="form-control" placeholder="Enter discount %"
+               [(ngModel)]="form.discount" name="discount">
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="d-flex justify-content-between">
+      <button type="button" class="btn btn-outline-secondary" (click)="onCancel()">Cancel</button>
+      <button type="button" class="btn btn-success" (click)="onSubmit()">Next</button>
+    </div>
+  </div>
+</div>
+
+    </form>
+</section>

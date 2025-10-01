@@ -1,19 +1,15 @@
-import { NgFor } from '@angular/common';
 import { Component } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { ProductShowcaseComponent } from "../product showcase/product-showcase.component";
 
 @Component({
   selector: 'app-product',
-  imports: [NgFor],
+  imports: [ProductShowcaseComponent],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss'
 })
 export class ProductComponent {
-
-  products= [
-  {imgUrl: '/images/men.jpg', title: 'T-shirt', price: 2999, rating: 4.3, reviews: '1,23,456'},
-  {imgUrl: '/images/men.jpg', title: 'T-shirt', price: 2999, rating: 4.3, reviews: '1,23,456'},
-  {imgUrl: '/images/men.jpg', title: 'T-shrit', price: 2999, rating: 4.3, reviews: '1,23,456'},
-  ]
+Category_Name: String="Mens Shirts";
+search_result: String="10K";
+Popular_brands: String[] = ['Polo', 'H&M', 'Zara', 'Levis'];
 
 }

@@ -1,0 +1,17 @@
+.regImg{
+    background-image: url('/images/reg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 0 50px 50px 0;
+    width: 50dvw;
+    height: 100dvh;
+}
+.reg-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  
+    
+}
