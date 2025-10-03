@@ -14,17 +14,19 @@ public class UserRegiRequest {
 
 
 
-    private String id;
+
     @NotBlank
     private String username;
-    
+
     @NotBlank
     private String password;
 
-    @NotNull
-    private int contact;
     @NotBlank
-    private String userType;
+    private String email;
+
+    @NotBlank
+    private String contact;
+
 
     @NotBlank
     private String name;

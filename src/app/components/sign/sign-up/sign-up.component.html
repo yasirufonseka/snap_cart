@@ -7,27 +7,34 @@
         <div class="col-6 reg-container">
             <div class="card w-75 p-4 shadow-sm">
                 <h2 class="text-center mb-4">Sign Up</h2>
-                <form method="post">
+                <form method="post" [formGroup]='registerForm' (ngSubmit)="onSubmit()">
                     <div class="mb-3 px-3">
                         <label for="text" class="form-label">Name</label>
-                        <input type="text" class="form-control" aria-label="default input example" name="name"  id="name">
+                        <input type="text" formControlName="name" required class="form-control" aria-label="default input example" name="name"  id="name">
 
                          <label for="address" class="form-label">Address</label>
-                        <input type="text" class="form-control" aria-label="default input example" name="address" id="address">
+                        <input type="text" formControlName="address" required class="form-control" aria-label="default input example" name="address" id="address">
 
                         <label for="contact" class="form-label">Contact No</label>
-                        <input type="tel" class="form-control" aria-label="default input example" name="contact" id="contact">
+                        <input type="tel" formControlName="contact" required class="form-control" aria-label="default input example" name="contact" id="contact">
 
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" aria-label="default input example" name="email" id="email">
+                        <input type="email" formControlName="email" class="form-control" aria-label="default input example" name="email" id="email">
 
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" aria-label="default input example" name="userName" id="userName">
+                        <input type="text" formControlName="username" class="form-control" aria-label="default input example" name="userName" id="userName">
 
                         <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
-                        <input type="password" class="form-control" id="inputPassword">
+                        <input type="password" formControlName="password" class="form-control" id="inputPassword">
 
-                        <button class="btn btn-warning mt-5 w-100">Register</button>
+                        <!-- <label for="inputPassword" class="col-sm-2 col-form-label">User Type</label>
+                        <Select (change)="onChange($event)" formControlName="userType" class="form-select" aria-label="Default select example">
+                            <option value="Seller" >Seller</option>
+                            <option value="Buyer">Buyer</option> 
+                        </Select> -->
+                        
+
+                        <button type="submit" class="btn btn-warning mt-5 w-100">Register</button>
                         <div class="d-flex justify-content-center mt-3">
                             I already have an account?
                             &nbsp;

@@ -20,16 +20,15 @@ import javax.validation.constraints.NotNull;
 public class User {
 
 
-    @Id
-    private  String userId;
+
     @NotBlank
     private String name;
     @NotBlank
     private String address;
     @NotNull
-    private int contact;
+    private String contact;
     @NotBlank
-    private String userType;
+    private String email;
     @NotBlank
     @Indexed(unique = true)
     private String username;
