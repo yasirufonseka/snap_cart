@@ -1,18 +1,20 @@
+import { NgIf } from '@angular/common';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { EmailValidator, FormBuilder, FormGroup, ReactiveFormsModule, Validators, } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { NgStyle } from "@angular/common";
 
 @Component({
   selector: 'app-sign-up',
-  imports: [RouterLink, ReactiveFormsModule],
+  imports: [RouterLink, ReactiveFormsModule, NgStyle],
    // providers: [provideHttpClient()],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss',
   standalone: true
 })
 export class SignUpComponent {
-[x: string]: any;
+
 
 
   registerForm: FormGroup;
@@ -32,6 +34,10 @@ export class SignUpComponent {
 });
   }
 
+  get f(){
+    return this.registerForm.controls
+  }
+
  
   
 
@@ -44,15 +50,16 @@ export class SignUpComponent {
     console.log('Sending data:', register); // Check what's being sent
     
     this.http.post('http://localhost:8080/api/CreateUser', register).subscribe({
-      next: (response) => console.log("successful", response),
+      next: (response) => window.alert( "User Created Successfully"),
       error: (error) => {
         console.log("failed", error);
-        console.log("Error details:", error.error); 
+        window.alert( error.error); 
       }
     });
+    this.registerForm.reset()
   } else {
-    console.log('Form is invalid');
-    console.log(this.registerForm.errors);
+     window.alert('Form is invalid');
+    window.alert(this.registerForm.errors);
   }
   }
 

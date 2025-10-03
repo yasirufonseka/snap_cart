@@ -3,14 +3,21 @@
         <div class="col-6 login-container">
             <div class="card w-75 p-4 shadow-sm">
                 <h2 class="text-center mb-4">Sign In</h2>
-                <form method="post">
+                <form method="post" [formGroup]='loginForm' (ngSubmit)="onSubmit()">
                     <div class="mb-3 px-3">
                         <label for="email" class="form-label">Username</label>
-                        <input type="text" class="form-control" aria-label="default input example" name="userName"
+                        <input type="text" formControlName="username" class="form-control" 
+                        [ngStyle]="f['username'].touched && f['username'].invalid ? {'border-bottom':'2px solid red'} :{} "
+                         aria-label="default input example" name="username"
                             id="userName">
+
                         <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
-                        <input type="password" class="form-control" id="inputPassword">
-                        <button class="btn btn-warning mt-5 w-100">Log In</button>
+                        <input type="password" formControlName="password"
+                        [ngStyle]="f['password'].touched && f['password'].invalid ? {'border-bottom':'2px solid red'}:{}" 
+                        class="form-control" id="inputPassword">
+
+                        <button type="submit" class="btn btn-warning mt-5 w-100">Log In</button>
+
                         <div class="d-flex justify-content-center mt-3">
                             Don't have an account?
                             &nbsp;
