@@ -1,49 +1,64 @@
 <div class="containers-fluid">
     <div class="row justify-content-center align-items-center min-vh-100">
-      <div class="col-6  regImg">
+        <div class="col-6  regImg">
 
         </div>
-      
+
         <div class="col-6 reg-container">
             <div class="card w-75 p-4 shadow-sm">
                 <h2 class="text-center mb-4">Sign Up</h2>
                 <form method="post" [formGroup]='registerForm' (ngSubmit)="onSubmit()">
                     <div class="mb-3 px-3">
                         <label for="text" class="form-label">Name</label>
-                        <input type="text" formControlName="name" required class="form-control" aria-label="default input example" name="name"  id="name">
+                        <input type="text" formControlName="name" required class="form-control"
+                            [ngStyle]="f['name'].touched && f['name'].invalid ? {'border-bottom':'2px solid red'} : {}"  aria-label="default input example"
+                            name="name" id="name">
+                        <!-- <small *ngIf="f['name'].errors?.['required']">
+                            Name is required.
+                        </small> -->
 
-                         <label for="address" class="form-label">Address</label>
-                        <input type="text" formControlName="address" required class="form-control" aria-label="default input example" name="address" id="address">
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" formControlName="address" required class="form-control"
+                        [ngStyle]="f['address'].touched && f['address'].invalid ? {'border-bottom':'2px solid red'} : {}"
+                            aria-label="default input example" name="address" id="address">
 
                         <label for="contact" class="form-label">Contact No</label>
-                        <input type="tel" formControlName="contact" required class="form-control" aria-label="default input example" name="contact" id="contact">
+                        <input type="tel" formControlName="contact" required class="form-control"
+                        [ngStyle]="f['contact'].touched && f['contact'].invalid ? {'border-bottom':'2px solid red'} : {}"
+                            aria-label="default input example" name="contact" id="contact">
 
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" formControlName="email" class="form-control" aria-label="default input example" name="email" id="email">
+                        <input type="email" formControlName="email" class="form-control"
+                        [ngStyle]="f['email'].touched && f['email'].invalid ? {'border-bottom':'2px solid red'} : {}"
+                            aria-label="default input example" name="email" id="email">
 
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" formControlName="username" class="form-control" aria-label="default input example" name="userName" id="userName">
+                        <input type="text" formControlName="username" class="form-control"
+                        [ngStyle]="f['username'].touched && f['username'].invalid ? {'border-bottom':'2px solid red'} : {}"
+                            aria-label="default input example" name="userName" id="userName">
 
                         <label for="inputPassword" class="col-sm-2 col-form-label">Password</label>
-                        <input type="password" formControlName="password" class="form-control" id="inputPassword">
+                        <input type="password" formControlName="password"
+                        [ngStyle]="f['password'].touched && f['password'].invalid ? {'border-bottom':'2px solid red'} : {}"
+                         class="form-control" id="inputPassword">
 
                         <!-- <label for="inputPassword" class="col-sm-2 col-form-label">User Type</label>
                         <Select (change)="onChange($event)" formControlName="userType" class="form-select" aria-label="Default select example">
                             <option value="Seller" >Seller</option>
                             <option value="Buyer">Buyer</option> 
                         </Select> -->
-                        
+
 
                         <button type="submit" class="btn btn-warning mt-5 w-100">Register</button>
                         <div class="d-flex justify-content-center mt-3">
                             I already have an account?
                             &nbsp;
-                        <a href="" routerLink="/SignIn" class="float-">Sign in</a>
-                         </div>
+                            <a href="" routerLink="/SignIn" class="float-">Sign in</a>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
-        
+
     </div>
 </div>
