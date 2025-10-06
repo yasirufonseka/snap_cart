@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/")
@@ -43,13 +44,10 @@ public class Controller {
 
 
     @PostMapping("login")
-    public ResponseEntity<Map<String , String>> login(@RequestBody UserLogin loginReq) {
-        boolean success = authService.logIn(loginReq.getUsername(), loginReq.getPassword());
-        if (success) {
-            return ResponseEntity.ok(Map.of("message","Login successful!"));
-        } else {
-            return ResponseEntity.status(401).body(Map.of("message", "Invalid username or password"));
-        }
+    public Optional<String> login(@RequestBody UserLogin loginReq) {
+      Optional<String> success = authService.logIn(loginReq.getUsername(), loginReq.getPassword(), "");
+
+      return success;
     }
 
 
