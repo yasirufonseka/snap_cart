@@ -4,6 +4,9 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from "@angular/router";
 
+
+
+
 @Component({
   selector: 'app-sign-in',
   imports: [RouterLink, ReactiveFormsModule, NgStyle],
@@ -13,6 +16,12 @@ import { RouterLink } from "@angular/router";
 })
 export class SignInComponent {
 
+
+  // private document: @inject(DOCUMENT);
+  // private platformId: Inject(PLATFORM_ID);
+
+  loginResponce: String | undefined
+
   loginForm: FormGroup;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
@@ -21,23 +30,44 @@ export class SignInComponent {
       username: ['', [Validators.required, Validators.pattern('^[A-Za-z0-9]+$')]],
       password: ['', [Validators.required, Validators.pattern('^[A-Za-z0-9@#!]{8,32}$')]]
 
-
     });
+  document.cookie = "loginStatus=loginResponce; path=/; expires=${new Date(Date.now() + 864e5).toUTCString()}; secure`";
+  console.log(document.cookie);
+
   }
-   onSubmit() {
-    if(this.loginForm.valid){
+
+
+
+
+  onSubmit() {
+    if (this.loginForm.valid) {
       const login = this.loginForm.value;
       console.log('Sending data:', login); // Check what's being sent
 
-     this.http.post('http://localhost:8080/api/login', login,{responseType:"text"}).subscribe({
-        next:(response) => {window.alert("login successful"), console.log(response);},
-        error:(error) =>{ console.log("faild login", error);}
-      })
+      this.http.post('http://localhost:8080/api/login', login, { responseType: "text" }).subscribe({
+        next: (response) => {
+          window.alert(response);
+          this.loginResponce = response
+
+          //set cookie with loginresponce value
+          document.cookie = `loginStatus=${this.loginResponce}; path=/; expires=${new Date(Date.now() + 864e5).toUTCString()}; secure`;
+          console.log(document.cookie);
+        },
+        error: (error) => { console.log("faild login", error); }
+      }
+      );
+
     }
-    
-}
+  }
+
+
 
 get f(){
-  return this.loginForm.controls
-}
-}
+      return this.loginForm.controls
+    }
+
+ 
+
+
+  }
+

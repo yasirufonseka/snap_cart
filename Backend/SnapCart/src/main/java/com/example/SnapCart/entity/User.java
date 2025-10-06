@@ -2,15 +2,19 @@ package com.example.SnapCart.entity;
 
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.GeneratedColumn;
+import org.springframework.aot.generate.Generated;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.repository.Update;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.Date;
 
 @Document(collection="User")
 @Getter
@@ -19,8 +23,8 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class User {
 
-
-
+    @GeneratedColumn("")
+    private String id;
     @NotBlank
     private String name;
     @NotBlank
@@ -34,5 +38,6 @@ public class User {
     private String username;
     @NotBlank
     private String password;
+
 
 }
