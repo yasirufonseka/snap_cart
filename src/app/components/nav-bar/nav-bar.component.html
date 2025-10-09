@@ -2,7 +2,9 @@
 <!--top- nav-->
 <nav class="navbar  shadow-sm px-4 py-3 bg-white  ">
     <div class="logo_container navBar ">
-        <img src="" alt="logo" srcset="">
+        <a href="" routerLink="/">
+        <img src="/logo.png" alt="logo" srcset="">
+        </a>
     </div>
     <div class="content_container ">
        <a href="" routerLink="/SignUp"><button class="btn btn-success px-4 py-2 m-2 fw-semibold">Sign Up</button></a> 
@@ -23,13 +25,11 @@
     <div class="col-2"></div>
     <div class="nav-links col-6">
         <ul class="nav fm-semibold">
-            <li class="nav-item"><a class="nav-link text-dark" href="#">Women</a></li>
-            <li class="nav-item">
-                <a class="nav-link active-link" href="#">Men</a>
-            </li>
-            <li class="nav-item"><a class="nav-link text-dark" href="#">Kids</a></li>
-            <li class="nav-item"><a class="nav-link text-dark" href="#">Sports</a></li>
-            <li class="nav-item"><a class="nav-link text-dark" href="#">Brands</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/product" [class.text-dark]="active!=='women'"  [class.active-link]="active==='women'" href="#" (click)="setActive('women')">Women</a></li>
+            <li class="nav-item "><a class="nav-link" routerLink="/product" [class.text-dark]="active!=='men'" [class.active-link]="active==='men'" href="#" (click)="setActive('men')">Men</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/product" [class.text-dark]="active!=='kids'" [class.active-link]="active==='kids'" href="#" (click)="setActive('kids')">Kids</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/product" [class.text-dark]="active!=='sports'" [class.active-link]="active==='sports'" href="#" (click)="setActive('sports')">Sports</a></li>
+            <li class="nav-item"><a class="nav-link" routerLink="/product" [class.text-dark]="active!=='brands'" [class.active-link]="active==='brands'" href="#" (click)="setActive('brands')">Brands</a></li>
         </ul>
     </div>
     <div class="user-actions col-2  ">

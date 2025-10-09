@@ -10,7 +10,51 @@
         
     </div>
     <div class="container">
+        <section>
+    <div class=" bg-secondary-subtle mt-5  p-5 ">
+        <div class=" text-start">
+            <h2 class="fs-2 fw-bold">Shop by style</h2>
+        </div>
+        <div class="d-flex flex-row  p-4 mt-2 ">
+            <div class="col" *ngFor="let product of products" data-bs-toggle="modal" data-bs-target="#productModal">
+                <div class="card w-75 h-100">
+                    <img src="{{ product.imgUrl }}" class="card-img-top w-100 rounded-3 p-4" alt="image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{product.title}}</h5>
+                        <p class="card-text">{{ product.price }}</p>
+                        <p class="card-text">{{ product.reviews }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!--Popular this week  -->
+
+<section>
+    <div class=" bg-light mt-5  p-5 ">
+        <div class=" text-start">
+            <h2 class="fs-2 fw-bold">Shop by style</h2>
+        </div>
+        <div class="d-flex flex-row  p-4 mt-2 ">
+            <div class="col" *ngFor="let product of products" data-bs-toggle="modal" data-bs-target="#productModal">
+                <div class="card w-75 h-100">
+                    <img src="{{ product.imgUrl }}" class="card-img-top w-100 rounded-3 p-4" alt="image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{product.title}}</h5>
+                        <p class="card-text">{{ product.price }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="modal">
         
+    </div>
+</section>
     </div>
 </section>
 <section>

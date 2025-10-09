@@ -1,7 +1,7 @@
 import { NgStyle } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from "@angular/router";
 
 
@@ -31,8 +31,8 @@ export class SignInComponent {
       password: ['', [Validators.required, Validators.pattern('^[A-Za-z0-9@#!]{8,32}$')]]
 
     });
-  document.cookie = "loginStatus=loginResponce; path=/; expires=${new Date(Date.now() + 864e5).toUTCString()}; secure`";
-  console.log(document.cookie);
+  // document.cookie = "loginStatus=loginResponce; path=/; expires=${new Date(Date.now() + 864e5).toUTCString()}; secure`";
+  // console.log(document.cookie);
 
   }
 
@@ -52,6 +52,9 @@ export class SignInComponent {
           //set cookie with loginresponce value
           document.cookie = `loginStatus=${this.loginResponce}; path=/; expires=${new Date(Date.now() + 864e5).toUTCString()}; secure`;
           console.log(document.cookie);
+
+          //redirect to home page
+          window.location.href = '/home';
         },
         error: (error) => { console.log("faild login", error); }
       }

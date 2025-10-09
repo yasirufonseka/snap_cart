@@ -1,5 +1,6 @@
 package com.example.SnapCart.ErrorHandling;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,19 @@ public class GlobalExceptionHandler {
       errors.put(fieldName, errorMessage);
     });
     return ResponseEntity.badRequest().body(errors);
+  }
+
+  @ExceptionHandler(BadRequestException.class)
+  public ResponseEntity<Map<String, Object>> handleBadRequest(MethodArgumentNotValidException e){
+      Map<String,Object> errors = new HashMap<>();
+      e.getBindingResult().getAllErrors().forEach((error) -> {
+        String fieldName = ((FieldError) error).getField();
+        String errorMessage = error.getDefaultMessage();
+        errors.put(fieldName, errorMessage);
+
+
+      });
+    return ResponseEntity.status(500).body(errors);
   }
 
 }
