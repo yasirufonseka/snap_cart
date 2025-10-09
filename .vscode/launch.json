@@ -3,6 +3,13 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "java",
+      "name": "SnapCartApplication",
+      "request": "launch",
+      "mainClass": "com.example.SnapCart.SnapCartApplication",
+      "projectName": "SnapCart"
+    },
+    {
       "name": "ng serve",
       "type": "chrome",
       "request": "launch",

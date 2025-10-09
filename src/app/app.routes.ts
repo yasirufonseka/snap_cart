@@ -7,6 +7,7 @@ import { SignUpComponent } from './components/sign/sign-up/sign-up.component';
 import { HomeComponent } from './components/home/home.component';
 import { ProductComponent } from './components/product/product.component';
 import { SellerComponent } from './components/seller/seller.component';
+import { ProductMenComponent } from './components/product/product-men/product-men.component';
 
 export const routes: Routes = [
   
@@ -19,5 +20,6 @@ export const routes: Routes = [
     { path: "SignUp", component: SignUpComponent },
      { path: "product", component: ProductComponent },
      { path: "seller", component: SellerComponent },
+       { path: "productMen", component: ProductMenComponent },
     {path:'**' , redirectTo:'home'}
 ];
