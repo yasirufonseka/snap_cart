@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { NgFor, NgIf } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
 import { catchError, of } from 'rxjs';
-import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { NgStyle } from "@angular/common";
 
 
 export interface Product {
@@ -21,16 +22,17 @@ export interface Product {
   discount: number;
 }
 
-@Component({
-  selector: 'app-product-men',
-  templateUrl: './product-men.component.html',
-  styleUrls: ['./product-men.component.scss'],
-  imports: [NgIf, NgFor,NgOptimizedImage],
-  standalone: true
-})
-export class ProductMenComponent implements OnInit {
 
-  // Function to open modal (to be implemented)
+@Component({
+  selector: 'app-product-women',
+  imports: [NgIf, NgFor, NgStyle],
+  templateUrl: './product-women.component.html',
+  styleUrl: './product-women.component.scss',
+  
+})
+export class ProductWomenComponent implements OnInit {
+
+   // Function to open modal (to be implemented)
   openModal(product: Product) {
     // Implement modal opening logic here
   }
@@ -38,11 +40,11 @@ export class ProductMenComponent implements OnInit {
   loading = false;
   error: string | null = null;
 
-  Category_Name = 'Men';
+  Category_Name = 'Women';
   search_result = '';
   Popular_brands: String[] = [];
 
-  private readonly apiUrl = 'http://localhost:8080/api/GetProduct/ByCollection/men';
+  private readonly apiUrl = 'http://localhost:8080/api/GetProduct/ByCollection/women';
 
   constructor(private http: HttpClient) {
     console.log('ProductMenComponent initialized');

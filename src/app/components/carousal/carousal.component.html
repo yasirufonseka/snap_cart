@@ -16,6 +16,56 @@
 </div>
 <div class="slogan">
     <h1 class="fw-semibold">Buy for less. Sell for free. Keep fashion circular.</h1>
-    <button class="btn btn-warning px-4 py-2 m-3 fw-medium w-10  ">Style Assistence</button>
+    <button class="btn btn-warning px-4 py-2 m-3 fw-medium w-10  " data-bs-toggle="modal" data-bs-target="#aiModal">Style Assistence</button>
 </div>
- 
+
+<!-- AI modal -->
+<div class="container">
+    <div class="modal fade" id="aiModal" tabindex="-1" aria-labelledby="aiModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold" id="aiModalLabel">Style Assistence</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form class="form-control" id="styleForm" (onsubmit)="onSubmit()">
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">Describe your style preferences:</label>
+                            <textarea class="form-control" id="description" rows="4"
+                                placeholder="E.g., Casual, Formal, Sporty, Vintage, etc." formControlName="description"></textarea>
+                        </div>
+                        <!-- add gender -->
+                         <div class="mb-3">
+                            <label for="gender" class="form-label fw-semibold">Gender:</label>
+                            <select class="form-select" id="gender" formControlName="gender" (onChange)="handleChangeGender()">
+                                <option selected>Select your gender</option>    
+                                <option value="female">Female</option>
+                                <option value="male">Male</option>
+                                </select>
+                         </div>
+                        <div class="mb-3">
+                            <label for="occasion" class="form-label fw-semibold">Preferred Occasion:</label>
+                            <select class="form-select" id="occasion" formControlName="occasion">
+                                <option selected>Select an occasion</option>
+                                <option value="casual">Casual</option>
+                                <option value="formal">Formal</option>
+                                <option value="party">Party</option>
+                                <option value="work">Work</option>
+                                <option value="sports">Sports</option>
+                            </select>
+                        </div>
+                    <!-- add body type -->
+                       <div class="mb-3">
+                           <label for="bodyType" class="form-label fw-semibold">Body Type:</label>
+                           <select class="form-select" id="bodyType" formControlName="bodyType">
+                               <option selected>Select your body type</option>
+                               <option value="petite">Petite</option>
+                               <option value="average">Average</option>
+                               <option value="athletic">Athletic</option>
+                               <option value="plus">Plus Size</option>
+                           </select>
+                       </div>
+                        <button type="submit" class="btn btn-primary">Get Recommendations</button>
+                    </form>
+    </div>

@@ -1,11 +1,16 @@
 package com.example.SnapCart.controller;
 
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
+import com.example.SnapCart.modal.ProductModal;
+import com.example.SnapCart.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,20 +31,24 @@ import com.example.SnapCart.services.AuthService;
 import com.example.SnapCart.services.ProductService;
 import com.example.SnapCart.services.UserService;
 
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
 @RequestMapping("api/")
-@CrossOrigin(origins = "http://localhost:4200")
 public class Controller {
 
   private final UserService userService;
   private final AuthService authService;
   private final ProductService productService;
 
+
+
   @Autowired
   public Controller(UserService userService, AuthService authService, ProductService productService) {
     this.userService = userService;
     this.authService = authService;
     this.productService = productService;
+
+
   }
 
 
@@ -80,7 +89,7 @@ public class Controller {
 
   //get products by category
   @GetMapping("GetProduct/ByCollection/{collection}")
-  public ResponseEntity<List<Product>> getMensProduct(@PathVariable("collection") String collection) {
+  public ResponseEntity<List<Product>> getsProductCollection(@PathVariable String collection) {
     List<Product> getProByCollection = productService.getProByCollection(collection);
 
     return new ResponseEntity<>(getProByCollection, HttpStatus.OK);
@@ -110,6 +119,16 @@ public class Controller {
       return ResponseEntity.badRequest().body(null);
     }
   }
+
+  @GetMapping("hello")
+  public List<Product> getHello(@PathVariable String city){
+    return productService.getProBycity(city);
+  }
+
+
+
+
+
 
 
 }

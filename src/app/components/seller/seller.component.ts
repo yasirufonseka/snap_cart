@@ -24,6 +24,7 @@ export class SellerComponent implements OnInit {
       brand: [''],
       serialNo: [''],
       colour: [''],
+      Occasion: [''],
       size: [''],
       age: [''],
       city: [''],

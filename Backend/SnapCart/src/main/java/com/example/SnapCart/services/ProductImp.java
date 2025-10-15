@@ -4,7 +4,6 @@ package com.example.SnapCart.services;
 import com.example.SnapCart.dto.ProductDto;
 import com.example.SnapCart.entity.Product;
 import com.example.SnapCart.repository.ProductRepository;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +62,12 @@ public class ProductImp implements ProductService {
       throw new NullPointerException("No such items");
     }
 
+  }
+
+
+  @Override
+  public List<Product> getProBycity(String city) {
+    return productRepo.findByCity(city);
   }
 
 }
