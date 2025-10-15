@@ -14,6 +14,7 @@ public class ProductModal {
   private String serialNo;
   private Integer age;
   private String colour;
+  private String occasion;
   private String size;
   private String city;
   private double price;

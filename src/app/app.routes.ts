@@ -8,6 +8,7 @@ import { HomeComponent } from './components/home/home.component';
 import { ProductComponent } from './components/product/product.component';
 import { SellerComponent } from './components/seller/seller.component';
 import { ProductMenComponent } from './components/product/product-men/product-men.component';
+import { ProductWomenComponent } from './components/product/product-women/product-women.component';
 
 export const routes: Routes = [
   
@@ -21,5 +22,6 @@ export const routes: Routes = [
      { path: "product", component: ProductComponent },
      { path: "seller", component: SellerComponent },
        { path: "productMen", component: ProductMenComponent },
+       { path: "productWomen", component: ProductWomenComponent },
     {path:'**' , redirectTo:'home'}
 ];

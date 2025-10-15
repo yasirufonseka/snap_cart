@@ -22,7 +22,7 @@
           <h5 class="product-brand">{{ product.brand }}</h5>
           <p class="product-price">Rs. {{ product.price }} <span class="badge bg-danger ms-2">{{ product.discount }}% Off</span></p>
           <p class="product-size">Size: {{ product.size }}</p>
-          <p class="product-color">Color: {{ product.colour }}</p>
+          <p class="product-color d-flex align-items-center">Color: <span  [ngStyle]="{'background-color': product.colour , 'border': '1px solid #000'}" class="color-box d-grid ms-2 me-2 p-2"></span>{{product.colour}}</p>
           <p class="product-condition">Condition: {{ product.condition }}</p>
           <div class="d-grid gap-2 my-3">
             <button class="btn btn-warning">Buy Now</button>

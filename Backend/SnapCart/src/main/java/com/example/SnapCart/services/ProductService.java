@@ -10,7 +10,9 @@ public interface ProductService {
 
   Product saveProduct(ProductDto reqProduct);
   Product getProductById(String id);
-   List<Product> getProByCollection(String collection);
+  List<Product> getProByCollection(String collection);
    List<Product> getProductByItem(String Items);
 
+
+  List<Product> getProBycity(String city);
 }
