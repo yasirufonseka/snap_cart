@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, of } from 'rxjs';
-import { NgFor, NgIf, NgOptimizedImage } from '@angular/common';
+import { NgFor, NgIf, NgOptimizedImage, NgStyle } from '@angular/common';
 
 
 export interface Product {
@@ -25,15 +25,14 @@ export interface Product {
   selector: 'app-product-men',
   templateUrl: './product-men.component.html',
   styleUrls: ['./product-men.component.scss'],
-  imports: [NgIf, NgFor,NgOptimizedImage],
+  imports: [NgIf, NgFor,NgStyle,NgOptimizedImage],
   standalone: true
 })
 export class ProductMenComponent implements OnInit {
+product: any;
 
   // Function to open modal (to be implemented)
-  openModal(product: Product) {
-    // Implement modal opening logic here
-  }
+  // Removed duplicate openModal method
   products: Product[] = [];
   loading = false;
   error: string | null = null;
@@ -71,11 +70,15 @@ export class ProductMenComponent implements OnInit {
         this.loading = false;
         this.search_result = `${this.products.length} results`;
         console.log('Initial products:', this.products);
-        this.Popular_brands = this.products.map((product)=>{
-          return product.brand;
-        });
+        this.Popular_brands = Array.from(new Set(this.products.map(p => p.brand))).filter(Boolean);
       });
      
+  }
+  selectedProduct: Product | null = null;
+  
+  openModal(product: Product) {
+    this.selectedProduct = product;
+    // Optionally, reset carousel to first image (Bootstrap handles this by default)
   }
 
 }

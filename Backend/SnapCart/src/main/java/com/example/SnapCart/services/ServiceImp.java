@@ -36,4 +36,9 @@ public class ServiceImp implements UserService {
         return userRepository.save(user);
     }
 
+    @Override
+    public java.util.List<com.example.SnapCart.entity.User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
 }

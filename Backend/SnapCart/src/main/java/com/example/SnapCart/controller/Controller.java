@@ -1,17 +1,14 @@
 package com.example.SnapCart.controller;
 
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
-import com.example.SnapCart.modal.ProductModal;
-import com.example.SnapCart.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -33,20 +30,21 @@ import com.example.SnapCart.services.UserService;
 
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
-@RequestMapping("api/")
+@RequestMapping("/api/")
 public class Controller {
 
   private final UserService userService;
   private final AuthService authService;
   private final ProductService productService;
-
+  private final MongoTemplate mongoTemplate;
 
 
   @Autowired
-  public Controller(UserService userService, AuthService authService, ProductService productService) {
+  public Controller(UserService userService, AuthService authService, ProductService productService, MongoTemplate mongoTemplate) {
     this.userService = userService;
     this.authService = authService;
     this.productService = productService;
+    this.mongoTemplate = mongoTemplate;
 
 
   }
@@ -64,13 +62,66 @@ public class Controller {
     }
   }
 
-  @PostMapping("login")
+  @PostMapping("/login")
   public ResponseEntity<?> login(@RequestBody UserLogin loginReq) {
-    Optional<String> success = authService.logIn(loginReq.getUsername(), loginReq.getPassword(), "");
-    if (success.isPresent()) {
-      return ResponseEntity.ok(success.get());
+    System.out.println("🔐 POST /api/login received");
+    // Authenticate using AuthService which now returns Optional<User>
+    Optional<UsergIn(
+        loginReq.getUsername(),
+        loginReq.getPassword()
+    );
+
+    if (userOpt.isPresent()) {
+      com.example.SnapCart.entity.User user = userOpt.get();
+      // Return a small JSON payload so frontend can store user id and role
+      Map<String, String> resp = new java.util.HashMap<>();
+      resp.put("id", user.getId());
+      // If role doesn't exist, default to "seller"
+      resp.put("role", "seller");
+
+      System.out.println("✅ Login successful: userId=" + user.getId());
+      return ResponseEntity.ok(resp);
     } else {
-      return ResponseEntity.status(401).body("Invalid username or password");
+      System.out.println("❌ Login failed: invalid credentials");
+      Map<String, String> err = new java.util.HashMap<>();
+      err.put("error", "Incorrect username or password");
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(err);
+    }
+  }
+
+  @GetMapping("/login")
+  public ResponseEntity<?> loginGetError() {
+    System.out.println("⚠️ GET /api/login called - this endpoint only accepts POST. Use POST instead.");
+    Map<String, String> err = new java.util.HashMap<>();
+    err.put("error", "Login endpoint only accepts POST requests. Please POST your credentials to /api/login");
+    err.put("note", "Use POST with body: {\"username\":\"...\",\"password\":\"...\"}");
+    return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(err);
+  }
+
+//get all users
+  @GetMapping("/users")
+  public ResponseEntity<List<User>> getallusers(){
+    List<User> users = userService.getAllUsers();
+    return new ResponseEntity<>(users, HttpStatus.OK);
+  };
+
+
+  @GetMapping("/health/db")
+  public ResponseEntity<String> checkDatabaseConnection() {
+    try {
+      // Try to execute a simple command
+       mongoTemplate.getDb().getName();
+      String dbName = mongoTemplate.getDb().getName();
+      long userCount = mongoTemplate.getCollection("users").countDocuments();
+
+      return ResponseEntity.ok(
+        "✅ MongoDB Connected!\n" +
+          "Database: " + dbName + "\n" +
+          "Users collection count: " + userCount
+      );
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body("❌ MongoDB Connection Failed: " + e.getMessage());
     }
   }
 
@@ -121,8 +172,8 @@ public class Controller {
   }
 
   @GetMapping("hello")
-  public List<Product> getHello(@PathVariable String city){
-    return productService.getProBycity(city);
+  public String getHello(){
+    return "hello";
   }
 
 

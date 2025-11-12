@@ -70,4 +70,46 @@ public class ProductImp implements ProductService {
     return productRepo.findByCity(city);
   }
 
+  @Override
+  public List<Product> getProductsBySeller(String sellerId) {
+    return productRepo.findBySellerId(sellerId);
+  }
+
+  @Override
+  public Product updateProduct(String id, ProductDto productDto) {
+    Product existing = productRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product not found: " + id));
+
+    // update fields from DTO (only commonly updated fields)
+    existing.setBrand(productDto.getBrand());
+    existing.setCollection(productDto.getCollection());
+    existing.setItems(productDto.getItems());
+    existing.setCondition(productDto.getCondition());
+    existing.setSerialNo(productDto.getSerialNo());
+    existing.setColour(productDto.getColour());
+    existing.setSize(productDto.getSize());
+    existing.setAge(productDto.getAge());
+    existing.setCity(productDto.getCity());
+    existing.setPrice(productDto.getPrice());
+    existing.setDiscount(productDto.getDiscount());
+    existing.setDescription(productDto.getDescription());
+    existing.setImages(productDto.getImages());
+    existing.setStatus(productDto.getStatus());
+
+    return productRepo.save(existing);
+  }
+
+  @Override
+  public void deleteProduct(String id) {
+    productRepo.deleteById(id);
+  }
+
+  @Override
+  public Product updateProductStatus(String id, String status) {
+    Product existing = productRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Product not found: " + id));
+    existing.setStatus(status);
+    return productRepo.save(existing);
+  }
+
 }

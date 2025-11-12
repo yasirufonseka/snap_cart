@@ -15,4 +15,14 @@ public interface ProductService {
 
 
   List<Product> getProBycity(String city);
+
+  // Products by seller
+  List<Product> getProductsBySeller(String sellerId);
+
+  // Update and delete operations used by dashboard controller
+  Product updateProduct(String id, ProductDto productDto);
+
+  void deleteProduct(String id);
+
+  Product updateProductStatus(String id, String status);
 }

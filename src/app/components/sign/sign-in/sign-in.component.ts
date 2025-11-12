@@ -2,7 +2,8 @@ import { NgStyle } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { AuthService } from '../../../services/auth.service';
 
 
 
@@ -11,7 +12,7 @@ import { RouterLink } from "@angular/router";
   selector: 'app-sign-in',
   imports: [RouterLink, ReactiveFormsModule, NgStyle],
   templateUrl: './sign-in.component.html',
-  styleUrl: './sign-in.component.scss',
+  styleUrls: ['./sign-in.component.scss'],
   standalone: true
 })
 export class SignInComponent {
@@ -24,7 +25,12 @@ export class SignInComponent {
 
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {
+  constructor(
+    private fb: FormBuilder, 
+    private http: HttpClient,
+    private authService: AuthService,
+    private router: Router
+  ) {
 
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.pattern('^[A-Za-z0-9]+$')]],
@@ -44,21 +50,19 @@ export class SignInComponent {
       const login = this.loginForm.value;
       console.log('Sending data:', login); // Check what's being sent
 
-      this.http.post('http://localhost:8080/api/login', login, { responseType: "text" }).subscribe({
+      this.http.post<any>('http://localhost:8080/api/login', login, {
+         headers: { 'Content-Type': 'application/json' }
+      }).subscribe({
         next: (response) => {
-          window.alert(response);
-          this.loginResponce = response
-
-          //set cookie with loginresponce value
-          document.cookie = `loginStatus=${this.loginResponce}; path=/; expires=${new Date(Date.now() + 864e5).toUTCString()}; secure`;
-          console.log(document.cookie);
-
-          //redirect to home page
-          window.location.href = '/home';
+          console.log('Login response:', response);
+          // response expected to be { id: string, username: string } on success
+          const userId = response?.id || response;
+          const role = 'seller'; // project currently does not track roles; default to seller if appropriate
+          this.authService.setUserData(userId, role);
+          this.router.navigate(['/home']);
         },
-        error: (error) => { console.log("faild login", error); }
-      }
-      );
+        error: (error) => { console.log('failed login', error); window.alert('Login failed: ' + (error?.error?.error || error.statusText)); }
+      });
 
     }
   }

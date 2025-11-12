@@ -1,0 +1,170 @@
+<div class="product-listings-container">
+  <!-- Header Section -->
+  <div class="listings-header">
+    <div class="header-left">
+      <h2>Product Listings</h2>
+      <span class="product-count">{{products.length}} Products</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" routerLink="/seller/add-product">
+        <i class="fas fa-plus"></i> Add New Product
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters and Controls -->
+  <div class="filters-section">
+    <div class="search-filter">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="fas fa-search"></i>
+        </span>
+        <input 
+          type="text" 
+          class="form-control" 
+          placeholder="Search products..."
+          [(ngModel)]="searchQuery"
+          (input)="filterProducts()">
+      </div>
+    </div>
+
+    <div class="filter-controls">
+      <div class="dropdown category-filter">
+        <select class="form-select" [(ngModel)]="selectedCategory" (change)="filterProducts()">
+          <option value="">All Categories</option>
+          <option value="men">Men's Wear</option>
+          <option value="women">Women's Wear</option>
+          <option value="kids">Kids Wear</option>
+          <option value="sports">Sports Wear</option>
+        </select>
+      </div>
+
+      <div class="dropdown status-filter">
+        <select class="form-select" [(ngModel)]="selectedStatus" (change)="filterProducts()">
+          <option value="">All Status</option>
+          <option value="available">Available</option>
+          <option value="sold">Sold</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+
+      <div class="sort-filter">
+        <select class="form-select" [(ngModel)]="sortBy" (change)="sortProducts()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="price-low">Price: Low to High</option>
+        </select>
+      </div>
+
+      <div class="view-toggle">
+        <button [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'">
+          <i class="fas fa-th-large"></i>
+        </button>
+        <button [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">
+          <i class="fas fa-list"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid View -->
+  <div class="products-grid" *ngIf="viewMode === 'grid'">
+    <div class="product-card" *ngFor="let product of filteredProducts">
+      <div class="product-image">
+        <img [src]="product.images[0]" [alt]="product.brand">
+        <div class="product-status" [class]="product.status">
+          {{product.status}}
+        </div>
+      </div>
+      <div class="product-info">
+        <h3>{{product.brand}} - {{product.items}}</h3>
+        <p class="product-description">{{product.description}}</p>
+        <div class="product-details">
+          <span class="price">${{product.price}}</span>
+          <span class="discount" *ngIf="product.discount > 0">-{{product.discount}}%</span>
+        </div>
+        <div class="product-metadata">
+          <span><i class="fas fa-map-marker-alt"></i> {{product.city}}</span>
+          <span><i class="fas fa-box"></i> {{product.collection}}</span>
+        </div>
+      </div>
+      <div class="product-actions">
+        <button class="btn btn-outline-primary" *ngIf="product.status === 'available'"
+                (click)="markAsSold(product)">
+          <i class="fas fa-check"></i> Mark as Sold
+        </button>
+        <button class="btn btn-outline-secondary" (click)="editProduct(product)">
+          <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="btn btn-outline-danger" (click)="deleteProduct(product)">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products List View -->
+  <div class="products-list" *ngIf="viewMode === 'list'">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Location</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of filteredProducts">
+          <td class="product-cell">
+            <img [src]="product.images[0]" [alt]="product.brand">
+            <div class="product-cell-info">
+              <h4>{{product.brand}} - {{product.items}}</h4>
+              <small>{{product.collection}}</small>
+            </div>
+          </td>
+          <td>{{product.collection}}</td>
+          <td>
+            <div class="price-cell">
+              <span class="current-price">${{product.price}}</span>
+              <span class="discount" *ngIf="product.discount > 0">-{{product.discount}}%</span>
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [class]="product.status">{{product.status}}</span>
+          </td>
+          <td>{{product.city}}</td>
+          <td>
+            <div class="table-actions">
+              <button class="btn btn-sm btn-outline-primary" *ngIf="product.status === 'available'"
+                      (click)="markAsSold(product)">
+                <i class="fas fa-check"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" (click)="editProduct(product)">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product)">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="filteredProducts.length === 0">
+    <div class="empty-state-content">
+      <i class="fas fa-box-open"></i>
+      <h3>No Products Found</h3>
+      <p>{{getEmptyStateMessage()}}</p>
+      <button class="btn btn-primary" routerLink="/seller/add-product">
+        Add Your First Product
+      </button>
+    </div>
+  </div>
+</div>

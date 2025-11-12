@@ -32,10 +32,8 @@ export interface Product {
 })
 export class ProductWomenComponent implements OnInit {
 
-   // Function to open modal (to be implemented)
-  openModal(product: Product) {
-    // Implement modal opening logic here
-  }
+   
+ 
   products: Product[] = [];
   loading = false;
   error: string | null = null;
@@ -79,5 +77,13 @@ export class ProductWomenComponent implements OnInit {
       });
      
   }
+
+  selectedProduct: Product | null = null;
+    
+    openModal(product: Product) {
+      this.selectedProduct = product;
+      // Optionally, reset carousel to first image (Bootstrap handles this by default)
+    }
+  
 
 }

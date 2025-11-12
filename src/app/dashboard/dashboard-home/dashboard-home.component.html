@@ -1,0 +1,149 @@
+ <!-- Main Content -->
+  <main class="dashboard-main ">
+    <!-- Header -->
+    <header class="dashboard-header">
+      <div class="header-search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search...">
+      </div>
+      <div class="header-actions">
+        <button class="notification-btn">
+          <i class="fas fa-bell"></i>
+          <span class="badge">3</span>
+        </button>
+        <div class="user-profile">
+          <img src="assets/images/avatar.png" alt="User Avatar">
+          <span>John Doe</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+     
+      
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: #e3f2fd;">
+            <i class="fas fa-shopping-bag" style="color: #1976d2;"></i>
+          </div>
+          <div class="stat-details">
+            <h4>Total Sales</h4>
+            <p class="stat-value">$24,780</p>
+            <span class="stat-change positive">+12.5%</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: #e8f5e9;">
+            <i class="fas fa-users" style="color: #388e3c;"></i>
+          </div>
+          <div class="stat-details">
+            <h4>Active Users</h4>
+            <p class="stat-value">1,482</p>
+            <span class="stat-change positive">+8.2%</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: #fff3e0;">
+            <i class="fas fa-box" style="color: #f57c00;"></i>
+          </div>
+          <div class="stat-details">
+            <h4>Products</h4>
+            <p class="stat-value">384</p>
+            <span class="stat-change positive">+23.1%</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: #fce4ec;">
+            <i class="fas fa-heart" style="color: #d81b60;"></i>
+          </div>
+          <div class="stat-details">
+            <h4>Reviews</h4>
+            <p class="stat-value">928</p>
+            <span class="stat-change negative">-2.4%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <div class="chart-container sales-chart">
+          <div class="chart-header">
+            <h3>Sales Analytics</h3>
+            <div class="chart-actions">
+              <button class="btn-outline">Weekly</button>
+              <button class="btn-outline active">Monthly</button>
+              <button class="btn-outline">Yearly</button>
+            </div>
+          </div>
+          <div class="chart-placeholder">
+            <!-- Chart will be rendered here -->
+            <div class="placeholder-text">Sales Chart</div>
+          </div>
+        </div>
+        <div class="chart-container traffic-chart">
+          <div class="chart-header">
+            <h3>Traffic Sources</h3>
+            <button class="btn-icon">
+              <i class="fas fa-ellipsis-v"></i>
+            </button>
+          </div>
+          <div class="chart-placeholder">
+            <!-- Chart will be rendered here -->
+            <div class="placeholder-text">Traffic Chart</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Products -->
+      <div class="recent-products">
+        <div class="section-header">
+          <h3>Recent Products</h3>
+          <button class="btn-primary">View All</button>
+        </div>
+        <div class="products-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="product-cell">
+                  <img src="assets/images/product1.jpg" alt="Product">
+                  <span>Nike Air Max</span>
+                </td>
+                <td>Shoes</td>
+                <td>$129.99</td>
+                <td><span class="status-badge in-stock">In Stock</span></td>
+                <td>
+                  <button class="btn-icon"><i class="fas fa-edit"></i></button>
+                  <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td class="product-cell">
+                  <img src="assets/images/product2.jpg" alt="Product">
+                  <span>Levi's Jeans</span>
+                </td>
+                <td>Clothing</td>
+                <td>$89.99</td>
+                <td><span class="status-badge low-stock">Low Stock</span></td>
+                <td>
+                  <button class="btn-icon"><i class="fas fa-edit"></i></button>
+                  <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+

@@ -17,6 +17,8 @@ public interface ProductRepository extends MongoRepository<Product, String> {
   List<Product> findByBrand(String brand);
   List<Product> findBySize(String size);
   List<Product> findByCity(String city);
+  // Match the Product entity field name 'sellerId'
+  List<Product> findBySellerId(String sellerId);
 
 
 
