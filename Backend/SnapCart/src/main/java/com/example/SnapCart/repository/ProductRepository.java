@@ -17,11 +17,12 @@ public interface ProductRepository extends MongoRepository<Product, String> {
   List<Product> findByBrand(String brand);
   List<Product> findBySize(String size);
   List<Product> findByCity(String city);
-  // Match the Product entity field name 'sellerId'
   List<Product> findBySellerId(String sellerId);
-
-
-
+  long countBySellerId(String sellerId);
+  List<Product> findByItemsContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String items, String description);
+  
+  // Get recent products for a seller, ordered by ID descending (newest first)
+  List<Product> findTop5BySellerIdOrderByIdDesc(String sellerId);
 
 
 }

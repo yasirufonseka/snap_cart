@@ -1,16 +1,40 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { AuthService } from '../../services/auth.service';
-import { ProductService } from '../../services/product.service';
-import { Product } from '../../interface/product.interface';
+import { CookieHandlerService} from '../../services/cookie.handle';
+import { RouterLink } from '@angular/router';
+
+ interface Product {
+  id: string;
+  images: string[];
+  description: string;
+  collection: string;
+  items: string;
+  brand: string;
+  condition: string;
+  serialNo: string;
+  age: number;
+  colour: string;
+  size: string;
+  city: string;
+  price: number;
+  discount: number;
+  status: 'available' | 'sold' | 'draft';
+  sellerId: string;
+}
+ interface Stats {
+  totalProducts: number;
+  soldProducts: number;
+  draftProducts: number;
+  totalRevenue: number;
+}
 
 @Component({
   selector: 'app-product-listings',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterLink, RouterModule],
   templateUrl: './product-listings.component.html',
   styleUrls: ['./product-listings.component.scss']
 })
@@ -23,23 +47,42 @@ export class ProductListingsComponent implements OnInit {
   selectedStatus: string = '';
   sortBy: string = 'newest';
 
+
+  apiUrl: string = 'http://localhost:8080/api/dashboard/seller';
+  isedit: boolean=false;
+
   constructor(
     private http: HttpClient,
-    private authService: AuthService,
-    private productService: ProductService
+    private cookiehandler: CookieHandlerService,
+    private router: Router
+   
   ) {}
 
+  //get sellerId from cookie and load products
+  getCookie(name: string): string | undefined {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      const cookieValue = parts.pop();
+      return cookieValue ? cookieValue.split(';').shift() : undefined;
+    }
+    return undefined;
+  }
+
   ngOnInit() {
+   const token = this.cookiehandler.getCookie('loginStatus');
+   const sellerId = token ? token : '';
+    console.log('Seller ID from cookie:', sellerId);
     this.loadProducts();
   }
 
   loadProducts() {
-    const sellerId = this.authService.getSellerId();
+    const sellerId = this.cookiehandler.getCookie('loginStatus');
     console.log('=== LOAD PRODUCTS DEBUG ===');
-    console.log('Seller ID from localStorage:', sellerId);
-    console.log('User ID from localStorage:', this.authService.getUserId());
-    console.log('User Role from localStorage:', this.authService.getRole());
+    console.log('Seller ID from cookie:', sellerId);
+    console.log('User ID from cookie:', this.cookiehandler.getCookie('loginStatus'));
     
+
     if (!sellerId) {
       console.error('❌ No seller ID found in localStorage');
       window.alert('Please log in as a seller first');
@@ -47,11 +90,11 @@ export class ProductListingsComponent implements OnInit {
     }
 
     console.log('✓ Valid seller ID found');
-    console.log('📡 Making API request to: http://localhost:8080/api/dashboard/seller/' + sellerId);
-    
-    this.productService.getProductBySellerId(sellerId)
+    console.log('📡 Making API request to: http://localhost:8080/api/dashboard/seller' + sellerId);
+
+    this.http.get<Product[]>(`${this.apiUrl}?sellerId=${sellerId}`)
       .subscribe({
-        next: (products) => {
+        next: (products: Product[]) => {
           console.log('✓ API Response Status: 200 OK');
           console.log('📦 Products received from backend:', products);
           console.log('📊 Number of products:', products.length);
@@ -62,11 +105,13 @@ export class ProductListingsComponent implements OnInit {
             console.log('  1. Check MongoDB: db.products.find({ sellerId: "' + sellerId + '" })');
             console.log('  2. Create a test product if none exist');
             console.log('  3. Verify product was saved with correct sellerId');
+          
+            
           }
           
           this.products = products;
           this.filterProducts();
-          console.log('✓ Products loaded and filtered successfully');
+          console.log('✓ Products loaded and filtered successfully',);
         },
         error: (error) => {
           console.error('❌ Error loading products:');
@@ -128,7 +173,7 @@ export class ProductListingsComponent implements OnInit {
   }
 
   markAsSold(product: Product) {
-    this.productService.markAsSold(product.id)
+    this.http.put<Product>(`${this.apiUrl}/${product.id}`, { status: 'sold' })
       .subscribe({
         next: (updatedProduct) => {
           product.status = updatedProduct.status as 'available' | 'sold' | 'draft';
@@ -141,15 +186,24 @@ export class ProductListingsComponent implements OnInit {
       });
   }
 
-  editProduct(product: Product) {
-    // Navigate to edit page
-    // This will be implemented when we create the edit component
-    console.log('Edit product:', product.id);
+  editProduct(product: any) {
+    try {
+      // Navigate to product edit route with the product id
+      const id = (typeof product === 'string' || typeof product === 'number') ? product : product?.id;
+      if (!id) {
+        console.warn('editProduct called without an id', product);
+        return;
+      }
+      this.router.navigate(['/product-edit', id]);
+    } catch (error) {
+      console.error('Error navigating to edit product page:', error);
+      window.alert('Failed to navigate to edit product page');
+    }
   }
 
-  deleteProduct(product: Product) {
+  deleteProduct(product: any) {
     if (confirm('Are you sure you want to delete this product?')) {
-      this.productService.deleteProduct(product.id)
+      this.http.delete(`${this.apiUrl}/${product.id}`)
         .subscribe({
           next: () => {
             this.products = this.products.filter(p => p.id !== product.id);

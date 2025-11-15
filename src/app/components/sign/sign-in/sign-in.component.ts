@@ -2,8 +2,9 @@ import { NgStyle } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from "@angular/router";
-import { AuthService } from '../../../services/auth.service';
+import { RouterLink } from "@angular/router";
+import { OnInit } from '@angular/core';
+import { CookieHandlerService } from '../../../services/cookie.handle';
 
 
 
@@ -12,10 +13,10 @@ import { AuthService } from '../../../services/auth.service';
   selector: 'app-sign-in',
   imports: [RouterLink, ReactiveFormsModule, NgStyle],
   templateUrl: './sign-in.component.html',
-  styleUrls: ['./sign-in.component.scss'],
+  styleUrl: './sign-in.component.scss',
   standalone: true
 })
-export class SignInComponent {
+export class SignInComponent implements OnInit {
 
 
   // private document: @inject(DOCUMENT);
@@ -25,12 +26,7 @@ export class SignInComponent {
 
   loginForm: FormGroup;
 
-  constructor(
-    private fb: FormBuilder, 
-    private http: HttpClient,
-    private authService: AuthService,
-    private router: Router
-  ) {
+  constructor(private fb: FormBuilder, private http: HttpClient, private cookieHandler: CookieHandlerService) {
 
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.pattern('^[A-Za-z0-9]+$')]],
@@ -42,28 +38,62 @@ export class SignInComponent {
 
   }
 
+  getCookie(name: string): string | undefined {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) {
+      const cookieValue = parts.pop();
+      return cookieValue ? cookieValue.split(';').shift() : undefined;
+    }
+    return undefined;
+  }
 
+ngOnInit(): void {
+    // Check if user is already logged in
+    const loginStatus = this.getCookie('loginStatus');
+    if (loginStatus) {
+      this.loginResponce = loginStatus;
+      // Optionally, redirect to home page if already logged in
+      window.location.href = '/home';
+    }
+}
 
 
   onSubmit() {
     if (this.loginForm.valid) {
       const login = this.loginForm.value;
-      console.log('Sending data:', login); // Check what's being sent
+      console.log('=== FRONTEND LOGIN ATTEMPT ===');
+      console.log('Form data:', login);
+      console.log('Username:', login.username);
+      console.log('Password:', login.password);
+      console.log('Password length:', login.password ? login.password.length : 'null');
 
-      this.http.post<any>('http://localhost:8080/api/login', login, {
-         headers: { 'Content-Type': 'application/json' }
-      }).subscribe({
+      this.http.post('http://localhost:8080/api/login', login, { responseType: "text" }).subscribe({
         next: (response) => {
-          console.log('Login response:', response);
-          // response expected to be { id: string, username: string } on success
-          const userId = response?.id || response;
-          const role = 'seller'; // project currently does not track roles; default to seller if appropriate
-          this.authService.setUserData(userId, role);
-          this.router.navigate(['/home']);
-        },
-        error: (error) => { console.log('failed login', error); window.alert('Login failed: ' + (error?.error?.error || error.statusText)); }
-      });
+          console.log('✅ Login successful! Response:', response);
+          window.alert('Login successful!');
+          this.loginResponce = response
 
+          //set cookie with loginresponce value
+          this.cookieHandler.setCookie('loginStatus', this.loginResponce ? this.loginResponce.toString() : '', 1);
+          console.log('Cookie set:', document.cookie);
+          //redirect to home page
+          window.location.href = '/home';
+        },
+        error: (error) => { 
+          console.log('❌ Login failed!');
+          console.log('Error details:', error);
+          console.log('Status:', error.status);
+          console.log('Error message:', error.error);
+          window.alert('Login failed: ' + error.error);
+        }
+      });
+      
+    } else {
+      console.log('❌ Form is invalid!');
+      console.log('Form errors:', this.loginForm.errors);
+      console.log('Username errors:', this.loginForm.get('username')?.errors);
+      console.log('Password errors:', this.loginForm.get('password')?.errors);
     }
   }
 

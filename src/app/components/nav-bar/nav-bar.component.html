@@ -24,15 +24,76 @@
 <div class="navbar nav-bottom row">
     <div class="col-2"></div>
     <div class="nav-links col-6">
-        <ul class="nav fm-semibold">
-            <li class="nav-item"><a class="nav-link" routerLink="/productWomen" [class.text-dark]="active!=='women'"  [class.active-link]="active==='women'" href="#" (click)="setActive('women')">Women</a></li>
-            <li class="nav-item "><a class="nav-link" routerLink="/productMen" [class.text-dark]="active!=='men'" [class.active-link]="active==='men'" href="#" (click)="setActive('men')">Men</a></li>
-            <li class="nav-item"><a class="nav-link" routerLink="/productKids" [class.text-dark]="active!=='kids'" [class.active-link]="active==='kids'" href="#" (click)="setActive('kids')">Kids</a></li>
-            <li class="nav-item"><a class="nav-link" routerLink="/productSports" [class.text-dark]="active!=='sports'" [class.active-link]="active==='sports'" href="#" (click)="setActive('sports')">Sports</a></li>
-            <li class="nav-item"><a class="nav-link" routerLink="/productBrands" [class.text-dark]="active!=='brands'" [class.active-link]="active==='brands'" href="#" (click)="setActive('brands')">Brands</a></li>
+        <ul class="nav">
+        <li class="nav-item" routerLinkActive="text-primary" [routerLinkActiveOptions]="{exact: true}">
+            <a class="nav-link position-relative" 
+               routerLink="/" 
+               [class.text-dark]="active!=='home'" 
+               [class.text-primary]="active==='home'"
+               (click)="setActive('home')">
+                Home
+                <span class="active-indicator" *ngIf="active==='home'"></span>
+            </a>
+        </li>
+            <li class="nav-item">
+                <a class="nav-link position-relative" 
+                   routerLink="/productWomen" 
+                   [class.text-dark]="active!=='women'" 
+                   [class.text-primary]="active==='women'"
+                   href="#" 
+                   (click)="setActive('women')">
+                    Women
+                    <span class="active-indicator" *ngIf="active==='women'"></span>
+                </a>
+            </li>
+            
+            <li class="nav-item">
+                <a class="nav-link position-relative" 
+                   routerLink="/productMen" 
+                   [class.text-dark]="active!=='men'" 
+                   [class.text-primary]="active==='men'"
+                   href="#" 
+                   (click)="setActive('men')">
+                    Men
+                    <span class="active-indicator" *ngIf="active==='men'"></span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link position-relative" 
+                   routerLink="/productKids" 
+                   [class.text-dark]="active!=='kids'" 
+                   [class.text-primary]="active==='kids'"
+                   href="#" 
+                   (click)="setActive('kids')">
+                    Kids
+                    <span class="active-indicator" *ngIf="active==='kids'"></span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link position-relative" 
+                   routerLink="/productSports" 
+                   [class.text-dark]="active!=='sports'" 
+                   [class.text-primary]="active==='sports'"
+                   href="#" 
+                   (click)="setActive('sports')">
+                    Sports
+                    <span class="active-indicator" *ngIf="active==='sports'"></span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link position-relative" 
+                   routerLink="/productBrands" 
+                   [class.text-dark]="active!=='brands'" 
+                   [class.text-primary]="active==='brands'"
+                   href="#" 
+                   (click)="setActive('brands')">
+                    Brands
+                    <span class="active-indicator" *ngIf="active==='brands'"></span>
+                </a>
+            </li>
         </ul>
     </div>
-    <div class="user-actions d-flex justify-content-end col-4 align-items-center ">
+     <div class="user-actions d-flex justify-content-end col-4 align-items-center ">
         <span class="m-1">
               <button class="border-0 bg-transparent" routerLink="/dashboard">
            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z"/></svg>
@@ -44,15 +105,17 @@
                     d="m480-120-58-52q-101-91-167-157T150-447.5Q111-500 95.5-544T80-634q0-94 63-157t157-63q52 0 99 22t81 62q34-40 81-62t99-22q94 0 157 63t63 157q0 46-15.5 90T810-447.5Q771-395 705-329T538-172l-58 52Z" />
             </svg>
             </button>
-            <button class="border-0 bg-transparent">
-            <svg class="m-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
-                fill="#000000">
-                <path
-                    d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM208-800h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Z" />
-            </svg>
+            <button class="border-0 bg-transparent cart-btn position-relative" routerLink="/cart" title="Shopping Cart">
+                <svg class="m-2" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"
+                    fill="#000000">
+                    <path
+                        d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM208-800h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Z" />
+                </svg>
+                <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
             </button>
             
         </span>
         <a href="" routerLink="/seller"><button class="btn btn-warning px-4 py-2   me-1 fw-medium  ">Sell Now</button></a>
     </div>
+
 </div>

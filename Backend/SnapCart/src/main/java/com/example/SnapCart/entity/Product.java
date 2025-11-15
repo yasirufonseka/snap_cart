@@ -33,12 +33,8 @@ public class Product {
   private String city;
   private double price;
   private double discount;
-
-  // Additional fields used by dashboard and DTO mapping
-  private String status;     // e.g. "available", "sold", "draft"
   private String sellerId;
-  private String created_at;
-  private String updates_at;
+  private String status;
 
 
 }

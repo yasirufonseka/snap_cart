@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgFor, NgIf } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-seller',
@@ -15,12 +14,7 @@ import { Router } from '@angular/router';
 export class SellerComponent implements OnInit {
   addProduct: FormGroup;
 
-  constructor(
-    private fb: FormBuilder,
-    private http: HttpClient,
-    private authService: AuthService,
-    private router: Router
-  ) { 
+  constructor(private fb:FormBuilder,private http:HttpClient ) { 
     this.addProduct = this.fb.group({
       images: [''],
       description: [''],
@@ -122,9 +116,15 @@ updateSubcategories(selectedValue: string | null) {
     if (this.addProduct.valid) {
       const productData = this.addProduct.value;
       console.log('Form value:', productData);
-      const sellerId = this.authService.getSellerId();
-      
-      if (!sellerId) {
+      //check cookies for loginStatus
+      const cookies = document.cookie.split(';').reduce((acc: any, cookie) => {
+        const [key, value] = cookie.split('=').map(c => c.trim());
+        acc[key] = value;
+        console.log('Cookie:', key, value);
+        return acc;
+      }, {});
+
+      if(!cookies['loginStatus'] || cookies['loginStatus'] === 'undefined'){
         window.alert('Please login to add product');
         return;
       }else{
@@ -147,19 +147,14 @@ updateSubcategories(selectedValue: string | null) {
         city: productData.city || null,
         price: productData.price ? Number(productData.price) : 0.0,
         discount: productData.discount ? Number(productData.discount) : 0.0,
-        sellerId: sellerId,
-        status: 'available'
+        status: "available",
+        sellerId: cookies['loginStatus']
       };
 
-      this.http.post('http://localhost:8080/api/SaveProduct', payload, { responseType: "json" }).subscribe({
+      this.http.post('http://localhost:8080/api/SaveProduct', payload, { responseType: "text" }).subscribe({
         next: (response) => {
-          console.log(response);
-          this.router.navigate(['/seller/dashboard']);
-        },
-        error: (error) => { 
-          console.log("Failed to add product", error);
-          window.alert('Failed to add product. Please try again.');
-        }
+          console.log(response);},
+        error: (error) => { console.log("Failed to add product", error); }
 
       });
     }

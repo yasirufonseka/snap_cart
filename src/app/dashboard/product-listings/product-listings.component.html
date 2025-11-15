@@ -94,7 +94,7 @@
                 (click)="markAsSold(product)">
           <i class="fas fa-check"></i> Mark as Sold
         </button>
-        <button class="btn btn-outline-secondary" (click)="editProduct(product)">
+        <button class="btn btn-outline-secondary" [routerLink]="['/product-edit', product.id]" >
           <i class="fas fa-edit"></i> Edit
         </button>
         <button class="btn btn-outline-danger" (click)="deleteProduct(product)">
@@ -143,10 +143,10 @@
                       (click)="markAsSold(product)">
                 <i class="fas fa-check"></i>
               </button>
-              <button class="btn btn-sm btn-outline-secondary" (click)="editProduct(product)">
+              <button class="btn btn-sm btn-outline-secondary" (click)="editProduct(product.id)">
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product)">
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product.id)">
                 <i class="fas fa-trash"></i>
               </button>
             </div>

@@ -2,13 +2,11 @@ package com.example.SnapCart.controller;
 
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,29 +22,26 @@ import com.example.SnapCart.dto.UserRegiRequest;
 import com.example.SnapCart.entity.Product;
 import com.example.SnapCart.entity.User;
 import com.example.SnapCart.modal.UserLogin;
+import com.example.SnapCart.repository.UserRepository;
 import com.example.SnapCart.services.AuthService;
 import com.example.SnapCart.services.ProductService;
 import com.example.SnapCart.services.UserService;
 
 @CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("api/")
 public class Controller {
 
   private final UserService userService;
   private final AuthService authService;
   private final ProductService productService;
-  private final MongoTemplate mongoTemplate;
+  private final UserRepository userRepository;
 
-
-  @Autowired
-  public Controller(UserService userService, AuthService authService, ProductService productService, MongoTemplate mongoTemplate) {
+  public Controller(UserService userService, AuthService authService, ProductService productService, UserRepository userRepository) {
     this.userService = userService;
     this.authService = authService;
     this.productService = productService;
-    this.mongoTemplate = mongoTemplate;
-
-
+    this.userRepository = userRepository;
   }
 
 
@@ -62,73 +57,64 @@ public class Controller {
     }
   }
 
-  @PostMapping("/login")
+  @PostMapping("login")
   public ResponseEntity<?> login(@RequestBody UserLogin loginReq) {
-    System.out.println("🔐 POST /api/login received");
-    // Authenticate using AuthService which now returns Optional<User>
-    Optional<UsergIn(
-        loginReq.getUsername(),
-        loginReq.getPassword()
-    );
-
-    if (userOpt.isPresent()) {
-      com.example.SnapCart.entity.User user = userOpt.get();
-      // Return a small JSON payload so frontend can store user id and role
-      Map<String, String> resp = new java.util.HashMap<>();
-      resp.put("id", user.getId());
-      // If role doesn't exist, default to "seller"
-      resp.put("role", "seller");
-
-      System.out.println("✅ Login successful: userId=" + user.getId());
-      return ResponseEntity.ok(resp);
+    System.out.println("=== LOGIN REQUEST ===");
+    System.out.println("Username: " + loginReq.getUsername());
+    System.out.println("Password length: " + (loginReq.getPassword() != null ? loginReq.getPassword().length() : "null"));
+    
+    Optional<String> success = authService.logIn(loginReq.getUsername(), loginReq.getPassword(), "");
+    if (success.isPresent()) {
+      System.out.println("Login successful, returning user ID: " + success.get());
+      return ResponseEntity.ok(success.get());
     } else {
-      System.out.println("❌ Login failed: invalid credentials");
-      Map<String, String> err = new java.util.HashMap<>();
-      err.put("error", "Incorrect username or password");
-      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(err);
+      System.out.println("Login failed - Invalid credentials");
+      return ResponseEntity.status(401).body("Invalid username or password");
     }
   }
 
-  @GetMapping("/login")
-  public ResponseEntity<?> loginGetError() {
-    System.out.println("⚠️ GET /api/login called - this endpoint only accepts POST. Use POST instead.");
-    Map<String, String> err = new java.util.HashMap<>();
-    err.put("error", "Login endpoint only accepts POST requests. Please POST your credentials to /api/login");
-    err.put("note", "Use POST with body: {\"username\":\"...\",\"password\":\"...\"}");
-    return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(err);
+  @GetMapping("debug/users")
+  public ResponseEntity<?> debugUsers() {
+    List<User> allUsers = userRepository.findAll();
+    System.out.println("Total users in database: " + allUsers.size());
+    for (User user : allUsers) {
+      System.out.println("User: " + user.getUsername() + ", Password: " + user.getPassword() + ", ID: " + user.getId());
+    }
+    return ResponseEntity.ok("Found " + allUsers.size() + " users. Check console for details.");
   }
 
-//get all users
-  @GetMapping("/users")
-  public ResponseEntity<List<User>> getallusers(){
-    List<User> users = userService.getAllUsers();
-    return new ResponseEntity<>(users, HttpStatus.OK);
-  };
-
-
-  @GetMapping("/health/db")
-  public ResponseEntity<String> checkDatabaseConnection() {
+  @PostMapping("debug/create-test-user")
+  public ResponseEntity<?> createTestUser() {
     try {
-      // Try to execute a simple command
-       mongoTemplate.getDb().getName();
-      String dbName = mongoTemplate.getDb().getName();
-      long userCount = mongoTemplate.getCollection("users").countDocuments();
-
-      return ResponseEntity.ok(
-        "✅ MongoDB Connected!\n" +
-          "Database: " + dbName + "\n" +
-          "Users collection count: " + userCount
-      );
+      User testUser = new User();
+      testUser.setUsername("testuser");
+      testUser.setPassword("testpass123");
+      testUser.setEmail("test@example.com");
+      testUser.setName("Test User");
+      
+      User saved = userRepository.save(testUser);
+      System.out.println("Created test user: " + saved.getUsername() + " with password: " + saved.getPassword());
+      
+      return ResponseEntity.ok("Test user created: " + saved.getUsername() + " / " + saved.getPassword());
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body("❌ MongoDB Connection Failed: " + e.getMessage());
+      System.err.println("Error creating test user: " + e.getMessage());
+      return ResponseEntity.status(500).body("Error: " + e.getMessage());
     }
+  }
+
+  @PostMapping("debug/test-login")
+  public ResponseEntity<?> testLogin() {
+    UserLogin testLogin = new UserLogin();
+    testLogin.setUsername("testuser");
+    testLogin.setPassword("testpass123");
+    
+    return login(testLogin);
   }
 
   @PostMapping("SaveProduct")
   public ResponseEntity<?> addProduct(@RequestBody ProductDto productDto) {
     try {
-      Product saveItem = productService.saveProduct(productDto);
+      productService.saveProduct(productDto);
       return ResponseEntity.ok(productDto);
     } catch (RuntimeException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
@@ -171,9 +157,9 @@ public class Controller {
     }
   }
 
-  @GetMapping("hello")
-  public String getHello(){
-    return "hello";
+  @GetMapping("/products")
+  public List<Product> getAllProduct(){
+    return productService.getAllProducts();
   }
 
 

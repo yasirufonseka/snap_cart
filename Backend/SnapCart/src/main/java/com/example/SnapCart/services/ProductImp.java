@@ -1,13 +1,15 @@
 package com.example.SnapCart.services;
 
 
-import com.example.SnapCart.dto.ProductDto;
-import com.example.SnapCart.entity.Product;
-import com.example.SnapCart.repository.ProductRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.example.SnapCart.dto.ProductDto;
+import com.example.SnapCart.entity.Product;
+import com.example.SnapCart.repository.ProductRepository;
 
 @Service
 public class ProductImp implements ProductService {
@@ -32,6 +34,7 @@ public class ProductImp implements ProductService {
     product.setDiscount(reqProduct.getDiscount());
     product.setDescription(reqProduct.getDescription());
     product.setImages(reqProduct.getImages());
+    product.setSellerId(reqProduct.getSellerId()); // Add sellerId mapping
 
 
     return productRepo.save(product);
@@ -66,50 +69,109 @@ public class ProductImp implements ProductService {
 
 
   @Override
-  public List<Product> getProBycity(String city) {
-    return productRepo.findByCity(city);
+  public List<Product> getAllProducts() {
+    return productRepo.findAll();
   }
 
   @Override
-  public List<Product> getProductsBySeller(String sellerId) {
+  public List<Product> getProBySeller(String sellerId) {
+    System.out.print(productRepo.findBySellerId(sellerId));
     return productRepo.findBySellerId(sellerId);
   }
 
   @Override
-  public Product updateProduct(String id, ProductDto productDto) {
-    Product existing = productRepo.findById(id)
-        .orElseThrow(() -> new RuntimeException("Product not found: " + id));
+  public Product UpdateProduct(ProductDto updateProduct) {
+    if (updateProduct.getId() == null) {
+      return null;
+    }
+    Optional<Product> existingProduct = productRepo.findById(updateProduct.getId());
 
-    // update fields from DTO (only commonly updated fields)
-    existing.setBrand(productDto.getBrand());
-    existing.setCollection(productDto.getCollection());
-    existing.setItems(productDto.getItems());
-    existing.setCondition(productDto.getCondition());
-    existing.setSerialNo(productDto.getSerialNo());
-    existing.setColour(productDto.getColour());
-    existing.setSize(productDto.getSize());
-    existing.setAge(productDto.getAge());
-    existing.setCity(productDto.getCity());
-    existing.setPrice(productDto.getPrice());
-    existing.setDiscount(productDto.getDiscount());
-    existing.setDescription(productDto.getDescription());
-    existing.setImages(productDto.getImages());
-    existing.setStatus(productDto.getStatus());
+    if (existingProduct.isPresent()){
+      Product product = existingProduct.get();
+      product.setImages(updateProduct.getImages());
+      product.setBrand(updateProduct.getBrand());
+      product.setCollection(updateProduct.getCollection());
+      product.setItems(updateProduct.getItems());
+      product.setCondition(updateProduct.getCondition());
+      product.setSerialNo(updateProduct.getSerialNo());
+      product.setColour(updateProduct.getColour());
+      product.setSize(updateProduct.getSize());
+      product.setAge(updateProduct.getAge());
+      product.setCity(updateProduct.getCity());
+      product.setPrice(updateProduct.getPrice());
+      product.setDiscount(updateProduct.getDiscount());
+      product.setDescription(updateProduct.getDescription());
+      // Preserve sellerId - don't update it during product updates
+      if (updateProduct.getSellerId() != null) {
+        product.setSellerId(updateProduct.getSellerId());
+      }
+      return productRepo.save(product);
+    }
+    return null;
+  }
 
-    return productRepo.save(existing);
+  public long getTotalProductsBySeller(String sellerId) {
+    // count products by seller
+    return productRepo.countBySellerId(sellerId);
   }
 
   @Override
-  public void deleteProduct(String id) {
-    productRepo.deleteById(id);
+  public double getTotalSalesBySeller(String sellerId) {
+    // sum of products price by seller
+    System.out.println("ProductService: Searching for products with sellerId: '" + sellerId + "'");
+    List<Product> products = productRepo.findBySellerId(sellerId);
+    System.out.println("ProductService: Found " + products.size() + " products");
+    
+    if (products.isEmpty()) {
+      System.out.println("ProductService: No products found for sellerId: " + sellerId);
+      // Let's also check if there are any products at all
+      long totalProducts = productRepo.count();
+      System.out.println("ProductService: Total products in database: " + totalProducts);
+      return 0.0;
+    }
+    
+    System.out.println("ProductService: Product details:");
+    double runningTotal = 0.0;
+    for (Product p : products) {
+      double price = p.getPrice();
+      runningTotal += price;
+      System.out.println("  ID: " + p.getId() + ", Price: " + price + ", Running Total: " + runningTotal + ", SellerId: '" + p.getSellerId() + "'");
+    }
+    
+    double totalSales = products.stream()
+        .mapToDouble(Product::getPrice)
+        .sum();
+    System.out.println("ProductService: Stream calculated total: " + totalSales);
+    System.out.println("ProductService: Manual calculated total: " + runningTotal);
+    
+    // Let's also check if there are any sold quantities or other factors
+    System.out.println("ProductService: Raw product data check:");
+    for (Product p : products) {
+      System.out.println("  Product: " + p.getItems() + " | Brand: " + p.getBrand() + " | Price: " + p.getPrice() + " | Status: " + p.getStatus());
+    }
+    
+    return totalSales;
   }
 
   @Override
-  public Product updateProductStatus(String id, String status) {
-    Product existing = productRepo.findById(id)
-        .orElseThrow(() -> new RuntimeException("Product not found: " + id));
-    existing.setStatus(status);
-    return productRepo.save(existing);
+  public List<Product> getRecentProductsBySeller(String sellerId, int limit) {
+    System.out.println("Getting recent products for seller: " + sellerId + ", limit: " + limit);
+    
+    if (limit <= 5) {
+      // Use the optimized repository method for small limits
+      List<Product> recentProducts = productRepo.findTop5BySellerIdOrderByIdDesc(sellerId);
+      System.out.println("Found " + recentProducts.size() + " recent products using repository method");
+      return recentProducts;
+    } else {
+      // For larger limits, get all and sort manually
+      List<Product> allProducts = productRepo.findBySellerId(sellerId);
+      List<Product> recentProducts = allProducts.stream()
+          .sorted((a, b) -> b.getId().compareTo(a.getId()))
+          .limit(limit)
+          .collect(java.util.stream.Collectors.toList());
+      System.out.println("Found " + recentProducts.size() + " recent products using manual sorting");
+      return recentProducts;
+    }
   }
 
 }

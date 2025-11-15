@@ -1,5 +1,5 @@
  <!-- Main Content -->
-  <main class="dashboard-main ">
+  <main class="dashboard-main  ">
     <!-- Header -->
     <header class="dashboard-header">
       <div class="header-search">
@@ -30,8 +30,8 @@
           </div>
           <div class="stat-details">
             <h4>Total Sales</h4>
-            <p class="stat-value">$24,780</p>
-            <span class="stat-change positive">+12.5%</span>
+            <p class="stat-value" (load)="getTotalSales()">{{stats.totalSales | currency:'LKR':'symbol':'1.2-2'}}</p>
+          
           </div>
         </div>
         <div class="stat-card">
@@ -50,8 +50,8 @@
           </div>
           <div class="stat-details">
             <h4>Products</h4>
-            <p class="stat-value">384</p>
-            <span class="stat-change positive">+23.1%</span>
+            <p class="stat-value" (load)="countOfProduct()">{{stats.totalProducts}}</p>
+            
           </div>
         </div>
         <div class="stat-card">
@@ -114,30 +114,33 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr *ngFor="let product of recentProducts; trackBy: trackByProductId">
                 <td class="product-cell">
-                  <img src="assets/images/product1.jpg" alt="Product">
-                  <span>Nike Air Max</span>
+                  <img [src]="product.image" [alt]="product.name" onerror="this.src='assets/images/default-product.jpg'">
+                  <span>{{product.name}}</span>
+                  <small *ngIf="product.brand" class="text-muted">{{product.brand}}</small>
                 </td>
-                <td>Shoes</td>
-                <td>$129.99</td>
-                <td><span class="status-badge in-stock">In Stock</span></td>
+                <td>{{product.category}}</td>
+                <td>{{product.price | currency:'USD':'symbol':'1.2-2'}}</td>
                 <td>
-                  <button class="btn-icon"><i class="fas fa-edit"></i></button>
-                  <button class="btn-icon"><i class="fas fa-trash"></i></button>
+                  <span class="status-badge" [ngClass]="getStatusClass(product.status)">
+                    {{getStatusText(product.status)}}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-icon" (click)="editProduct(product.id)" title="Edit Product">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-icon" (click)="deleteProduct(product.id)" title="Delete Product">
+                    <i class="fas fa-trash"></i>
+                  </button>
                 </td>
               </tr>
-              <tr>
-                <td class="product-cell">
-                  <img src="assets/images/product2.jpg" alt="Product">
-                  <span>Levi's Jeans</span>
-                </td>
-                <td>Clothing</td>
-                <td>$89.99</td>
-                <td><span class="status-badge low-stock">Low Stock</span></td>
-                <td>
-                  <button class="btn-icon"><i class="fas fa-edit"></i></button>
-                  <button class="btn-icon"><i class="fas fa-trash"></i></button>
+              <!-- Show message when no products -->
+              <tr *ngIf="recentProducts.length === 0">
+                <td colspan="5" class="text-center py-4">
+                  <i class="fas fa-box-open fa-2x text-muted mb-2"></i>
+                  <p class="text-muted">No recent products found</p>
                 </td>
               </tr>
             </tbody>

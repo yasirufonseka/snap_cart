@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { ProductShowcaseComponent } from "../product showcase/product-showcase.component";
+//import { ProductShowcaseComponent } from "../product showcase/product-showcase.component";
 
 @Component({
   selector: 'app-product',
-  imports: [ProductShowcaseComponent],
+  imports: [],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss'
 })

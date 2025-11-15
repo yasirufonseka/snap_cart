@@ -25,7 +25,7 @@ export interface Product {
   selector: 'app-product-men',
   templateUrl: './product-men.component.html',
   styleUrls: ['./product-men.component.scss'],
-  imports: [NgIf, NgFor,NgStyle,NgOptimizedImage],
+  imports: [NgIf, NgFor,NgStyle],
   standalone: true
 })
 export class ProductMenComponent implements OnInit {
