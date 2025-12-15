@@ -29,7 +29,8 @@ export class SellerComponent implements OnInit {
       age: [''],
       city: [''],
       price: [''],
-      discount: ['']
+      discount: [''],
+      status: ['available'],
     });
   }
 
@@ -146,7 +147,9 @@ updateSubcategories(selectedValue: string | null) {
         size: productData.size || null,
         city: productData.city || null,
         price: productData.price ? Number(productData.price) : 0.0,
-        discount: productData.discount ? Number(productData.discount) : 0.0
+        discount: productData.discount ? Number(productData.discount) : 0.0,
+        status: "available",
+        sellerId: cookies['loginStatus']
       };
 
       this.http.post('http://localhost:8080/api/SaveProduct', payload, { responseType: "text" }).subscribe({
@@ -155,6 +158,8 @@ updateSubcategories(selectedValue: string | null) {
         error: (error) => { console.log("Failed to add product", error); }
 
       });
+
+      this.addProduct.reset();
     }
     }
   }

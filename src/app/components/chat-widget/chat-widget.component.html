@@ -1,0 +1,21 @@
+<div class="chat-container">
+  <div class="chat-messages">
+    <div *ngFor="let msg of messages" class="message" [class.user-message]="msg.author === 'user'" [class.bot-message]="msg.author === 'bot'">
+      <p>{{ msg.text }}</p>
+    </div>
+    <div *ngIf="isLoading" class="message bot-message">
+      <p class="typing-indicator"><span></span><span></span><span></span></p>
+    </div>
+  </div>
+  <div class="chat-input">
+    <input
+      #inputElement
+      type="text"
+      [value]="userInput"
+      (input)="userInput = inputElement.value"
+      (keyup.enter)="sendMessage()"
+      placeholder="Ask about products..."
+    />
+    <button (click)="sendMessage()" [disabled]="isLoading">Send</button>
+  </div>
+</div>

@@ -1,0 +1,151 @@
+ <!-- Main Content -->
+  <main class="dashboard-main  ">
+    <!-- Header -->
+    <!-- <header class="dashboard-header">
+      <div class="header-search">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Search...">
+      </div>
+      <div class="header-actions">
+        <button class="notification-btn">
+          <i class="fas fa-bell"></i>
+          <span class="badge">3</span>
+        </button>
+        <div class="user-profile">
+          <img src="assets/images/avatar.png" alt="User Avatar">
+          <span>John Doe</span>
+        </div>
+      </div>
+    </header> -->
+
+    <!-- Dashboard Content -->
+    <!-- <div class="dashboard-content">
+     <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: #e3f2fd;">
+            <i class="fas fa-shopping-bag" style="color: #1976d2;"></i>
+          </div>
+          <div class="stat-details">
+            <h4>Total Sales</h4>
+            <p class="stat-value" >{{totalSales.price | currency:'LKR':'symbol':'1.2-2'}}</p>
+           </div>
+        </div> 
+        </div> -->
+      
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <!-- <div class="stat-card">
+          <div class="stat-icon" style="background-color: #e3f2fd;">
+            <i class="fas fa-shopping-bag" style="color: #1976d2;"></i>
+          </div>
+          <div class="stat-details">
+            <h4>Total Sales</h4>
+            <p class="stat-value" >{{totalSales | currency:'LKR':'symbol':'1.2-2'}}</p>
+           </div>
+        </div>         -->
+        <div class="stat-card">
+          <div class="stat-icon" style="background-color: #fff3e0;">
+            <i class="fas fa-box" style="color: #f57c00;"></i>
+          </div>
+          <div class="stat-details">
+            <h4>Products</h4>
+            <p class="stat-value" >{{totalProducts}}</p>
+
+          </div>
+        </div>
+        
+         
+        </div>
+      
+
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <div class="chart-container sales-chart">
+          <div class="chart-header">
+            <h3>Products Sold Per Day</h3>
+            <div class="chart-actions">
+              <button class="btn-outline active" (click)="selectChartPeriod('weekly', $event)">Last 7 Days</button>
+              <button class="btn-outline" (click)="selectChartPeriod('monthly', $event)">Last 30 Days</button>
+              <button class="btn-outline" (click)="selectChartPeriod('yearly', $event)">This Year</button>
+            </div>
+          </div>
+          <div class="chart-content">
+            <canvas #soldProductsChart 
+                    width="400" 
+                    height="200" 
+                    style="max-height: 300px;">
+            </canvas>
+            <div class="chart-summary" *ngIf="soldProductsStats">
+              <div class="summary-stats">
+                <div class="summary-item">
+                  <span class="summary-label">Today:</span>
+                  <span class="summary-value">{{soldProductsStats.today || 0}} products sold</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">This Week:</span>
+                  <span class="summary-value">{{soldProductsStats.thisWeek || 0}} products sold</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">Total Sold:</span>
+                  <span class="summary-value">{{soldProductsStats.total || 0}} products</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+     
+
+      <!-- Recent Products -->
+      <div class="recent-products">
+        <div class="section-header">
+          <h3>Recent Products</h3>
+          <button class="btn-primary" routerLink="/dashboard/product-listings">View All</button>
+        </div>
+        <div class="products-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <!-- <th>Status</th>
+                <th>Actions</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of recentProducts; trackBy: trackByProductId">
+                <td class="product-cell">
+                  <img [src]="product.image" [alt]="product.name" onerror="this.src='assets/images/default-product.svg'">
+                  <span>{{product.name}}</span>
+                  <small *ngIf="product.brand" class="text-muted">{{product.brand}}</small>
+                </td>
+                <td>{{product.category}}</td>
+                <td>{{product.price | currency:'LKR.':'symbol':'1.2-2'}}</td>
+                <!-- <td>
+                  <span class="status-badge" [ngClass]="getStatusClass(product.status)">
+                    {{getStatusText(product.status)}}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn-icon" (click)="editProduct(product.id)" title="Edit Product">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn-icon" (click)="deleteProduct(product.id)" title="Delete Product">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td> -->
+              </tr>
+              <!-- Show message when no products -->
+              <tr *ngIf="recentProducts.length === 0">
+                <td colspan="5" class="text-center py-4">
+                  <i class="fas fa-box-open fa-2x text-muted mb-2"></i>
+                  <p class="text-muted">No recent products found</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+

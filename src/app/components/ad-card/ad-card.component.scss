@@ -15,9 +15,12 @@
 
 .ad-card::scroll-button(right){
     content: '→';
-    border: solid 2px rgb(255, 255, 255);
+    // border: solid 2px rgb(255, 255, 255);
+    border: none;
     background-color: transparent;
-    color: rgb(255, 255, 255);
+    font-weight: 800;
+    font-size: larger;
+    color: rgb(255, 0, 0);
     height: 60px;
     width: 60px;
     border-radius: 50%;
@@ -31,9 +34,11 @@
 
 .ad-card::scroll-button(left){
     content: '←';
-    border: solid 2px rgb(255, 255, 255);
+    border: none;
     background-color: transparent;
-    color: rgb(255, 255, 255);
+    font-weight: 800;
+    font-size: larger;
+    color: rgb(255, 0, 0);
     height: 60px;
     width: 60px;
     border-radius: 50%;
@@ -51,6 +56,22 @@
     background-repeat: no-repeat;
     height:300px
 
+}
+.adImgs{
+    background-image: url(/images/snekers.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height:300px
+
+
+}
+.adImg2{
+    background-image: url(/images/sunglass.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height:300px
 }
 .content{
     

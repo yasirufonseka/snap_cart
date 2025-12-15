@@ -1,45 +1,173 @@
 <section>
-    <div class=" bg-secondary-subtle mt-5  p-5 ">
-        <div class=" text-start">
+    <div class="bg-secondary-subtle mt-5 p-5">
+        <div class="text-start">
             <h2 class="fs-2 fw-bold">Shop by style</h2>
         </div>
-        <div class="d-flex flex-row  p-4 mt-2 ">
-            <div class="col" *ngFor="let product of products" data-bs-toggle="modal" data-bs-target="#productModal">
-                <div class="card w-75 h-100">
-                    <img src="{{ product.imgUrl }}" class="card-img-top w-100 rounded-3 p-4" alt="image">
-                    <div class="card-body">
-                        <h5 class="card-title">{{product.title}}</h5>
-                        <p class="card-text">{{ product.price }}</p>
-                        <p class="card-text">{{ product.reviews }}</p>
+
+        <!-- Debug info -->
+        <div class="mb-3" *ngIf="products.length === 0">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                Loading products... If products don't appear, check the browser console for debugging information.
+            </div>
+        </div>
+
+        <div class="row g-4 p-4 mt-2">
+            <div class="col-lg-3 col-md-4 col-sm-6" *ngFor="let product of getDisplayedProducts(); trackBy: trackByProductId">
+                <div class="modern-product-card" (click)="openProductModal(product)" data-bs-toggle="modal" data-bs-target="#productModal">
+                    <div class="card-image-wrapper">
+                        <img [src]="getProductImage(product)" class="product-image" [alt]="getProductName(product)"
+                            onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%23f0f0f0%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%23999%22%3EProduct%3C/text%3E%3C/svg%3E'">
+                        <div class="image-overlay">
+                            <div class="overlay-buttons">
+                                <button class="btn-icon-modern" title="Quick View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                               
+                                <button class="btn-icon-modern" title="Add to Cart"
+                                    (click)="addToCartFromOverlay(product, $event)">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="product-category" *ngIf="product.City">
+                            <span class="category-badge">{{ product.City }}</span>
+                        </div>
+
+                         <span class="bg-primary-subtle p-2 px-4 mb-4 rounded-pill font-monospace fw-semibold">{{product.brand}}</span>
+                        <h6 class="product-title p-2">{{ getProductName(product) }}</h6>
+                       
+                        <div class="product-rating">
+                            <div class="stars">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                           
+                        </div>
+                        <div class="product-price">
+                            <span class="current-price">LKR.{{ product.price || 'N/A' }}</span>
+                            <span class="original-price" *ngIf="product.originalPrice">LKR.{{ product.originalPrice
+                                }}</span>
+                            
+                        </div>
+                        <button class="add-to-cart-btn" (click)="addToCart(product, $event)"
+                            [class.in-cart]="isProductInCart(product)" [disabled]="!product.id">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span *ngIf="!isProductInCart(product)">Add to Cart</span>
+                            <span *ngIf="isProductInCart(product)">In Cart ({{ getProductCartQuantity(product)
+                                }})</span>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-<!--Popular this week  -->
-yyyyyyyyyyyyyy
-<section>
-    <div class=" bg-light mt-5  p-5 ">
-        <div class=" text-start">
-            <h2 class="fs-2 fw-bold">Shop by style</h2>
+
+        <!-- See More / Show Less Button -->
+        <div class="text-center mt-4 mb-4" *ngIf="hasMoreProducts()">
+            <button class="btn btn-outline-primary btn-lg px-5 py-3 see-more-btn" 
+                    (click)="toggleShowMore()">
+                <i class="fas" [ngClass]="showAllProducts ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                <span *ngIf="!showAllProducts">See More Products ({{ products.length - initialProductCount }} more)</span>
+                <span *ngIf="showAllProducts">Show Less</span>
+            </button>
         </div>
-        <div class="d-flex flex-row  p-4 mt-2 ">
-            <div class="col" *ngFor="let product of products" data-bs-toggle="modal" data-bs-target="#productModal">
-                <div class="card w-75 h-100">
-                    <img src="{{ product.imgUrl }}" class="card-img-top w-100 rounded-3 p-4" alt="image">
-                    <div class="card-body">
-                        <h5 class="card-title">{{product.title}}</h5>
-                        <p class="card-text">{{ product.price }}</p>
-                    </div>
-                </div>
-            </div>
+
+        <!-- No products message -->
+        <div class="text-center py-5" *ngIf="products.length === 0">
+            <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No products available</h4>
+            <p class="text-muted">Check the console for debugging information or try refreshing the page.</p>
         </div>
     </div>
 </section>
 
-<section>
-    <div class="modal">
-        
+<!-- Product Detail Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content modern-modal" *ngIf="selectedProduct">
+            <div class="modal-header border-0">
+                <h1 class="modal-title fs-4 fw-bold text-primary" id="productModalLabel">
+                    {{ getProductName(selectedProduct) }}
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <!-- Product Image Section -->
+                    <div class="col-md-5">
+                        <div class="product-image-container">
+                            <img [src]="getProductImage(selectedProduct)" 
+                                 class="product-modal-image" 
+                                 [alt]="getProductName(selectedProduct)"
+                                 onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%23f0f0f0%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%23999%22%3EProduct%3C/text%3E%3C/svg%3E'">
+                        </div>
+                    </div>
+                    
+                    <!-- Product Details Section -->
+                    <div class="col-md-7">
+                        <div class="product-info">
+                            <!-- Product Title -->
+                            <h2 class="product-modal-title mb-3">{{ getProductName(selectedProduct) }}</h2>
+                            
+                            <!-- Price Section -->
+                            <div class="price-display mb-3">
+                                <div class="current-price-modal">Rs. {{ selectedProduct.price || '2000' }}</div>
+                                <span class="discount-badge-modal" *ngIf="selectedProduct.originalPrice">{{ calculateDiscount(selectedProduct) }}% Off</span>
+                            </div>
+                            
+                            <!-- Product Specifications -->
+                            <div class="product-specifications mb-4">
+                                <div class="spec-row" *ngIf="selectedProduct.size || 'Large'">
+                                    <strong>Size:</strong> {{ selectedProduct.size || 'Large' }}
+                                </div>
+                                <div class="spec-row">
+                                    <strong>Serial No:</strong> {{ selectedProduct.serialNo || '223021123' }}
+                                </div>
+                                 <div class="spec-row">
+                                    <strong>Brand:</strong> {{ selectedProduct.brand || '223021123' }}
+                                </div>
+                                <div class="spec-row">
+                                    <strong>Color:</strong> 
+                                    <span class="color-indicator" [style.background-color]="selectedProduct.color || '#000'"></span>
+                                    {{ selectedProduct.color || 'Black' }}
+                                </div>
+                                <div class="spec-row">
+                                    <strong>Condition:</strong> {{ selectedProduct.condition || 'Used' }}
+                                </div>
+                                <div class="spec-row" *ngIf="selectedProduct.description">
+                                    <strong>Description:</strong>
+                                </div>
+                                <div class="spec-row" *ngIf="selectedProduct.City">
+                                    <strong>City:</strong> {{ selectedProduct.City }}
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="action-buttons-modal">
+                                <button class="btn-buy-now mb-3" (click)="buyNow()">
+                                    Buy Now
+                                </button>
+                                <button class="btn-add-cart mb-3" (click)="addToCartFromModal()">
+                                    Add to Cart
+                                </button>
+                            </div>
+                            
+                            <!-- Buyer Protection -->
+                            <div class="buyer-protection">
+                                <small class="text-muted">
+                                    All purchases through Snap Cart covered by Buyer Protection.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
+</div>

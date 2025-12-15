@@ -30,5 +30,8 @@ public class ProductDto {
   private String city;
   private double price;
   private double discount;
+  private String sellerId;
+  private String sellerName;
+  private String status;
 
 }

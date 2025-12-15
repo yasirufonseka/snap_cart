@@ -1,0 +1,73 @@
+<div class="image-identify-container">
+    <!-- Floating Icon Button -->
+    <button class="floating-btn" (click)="toggleChat()" [class.active]="isOpen">
+        <span class="icon">📸</span>
+    </button>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel" [class.open]="isOpen">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="header-content">
+                <span class="header-icon">📸</span>
+                <h3>Image Identifier</h3>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" (click)="clearChat()" title="Clear chat">
+                    🗑️
+                </button>
+                <button class="icon-btn close-btn" (click)="toggleChat()" title="Close">
+                    ✖️
+                </button>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="messages-area">
+            <div *ngFor="let message of messages" class="message" [class.user-message]="message.isUser"
+                [class.bot-message]="!message.isUser">
+                <div class="message-content">
+                    <img *ngIf="message.imageUrl" [src]="message.imageUrl" class="message-image" alt="Uploaded image">
+                    <p>{{ message.text }}</p>
+                </div>
+            </div>
+
+            <!-- Loading indicator -->
+            <div *ngIf="isLoading" class="message bot-message">
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <!-- Image Preview -->
+            <div *ngIf="previewUrl" class="image-preview">
+                <img [src]="previewUrl" alt="Preview">
+                <button class="remove-preview" (click)="removePreview()">✖️</button>
+            </div>
+
+            <!-- URL Input -->
+            <div class="url-input-section">
+                <input type="text" [(ngModel)]="imageUrl" placeholder="Paste image URL here..." class="url-input"
+                    [disabled]="isLoading || selectedFile !== null">
+                <label class="file-upload-btn" [class.disabled]="isLoading || imageUrl !== ''">
+                    📁
+                    <input type="file" (change)="onFileSelected($event)" accept="image/*"
+                        [disabled]="isLoading || imageUrl !== ''">
+                </label>
+            </div>
+
+            <!-- Send Button -->
+            <button class="send-btn" (click)="sendImage()" [disabled]="isLoading || (!imageUrl && !selectedFile)">
+                <span *ngIf="!isLoading">🚀</span>
+                <span *ngIf="isLoading">⏳</span>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,277 @@
+<div class="checkout-container">
+  <!-- Header -->
+  <div class="checkout-header">
+    <button class="back-btn" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      Back to Cart
+    </button>
+    <h1 class="checkout-title">
+      <i class="fas fa-credit-card"></i>
+      Secure Checkout
+    </h1>
+    <div class="security-badge">
+      <i class="fas fa-shield-alt"></i>
+      SSL Secured
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+    </div>
+    <p>Loading checkout...</p>
+  </div>
+
+  <!-- Checkout content -->
+  <div class="checkout-content" *ngIf="!loading">
+    <form [formGroup]="checkoutForm" (ngSubmit)="processCheckout()" class="checkout-form">
+      
+      <!-- Left Column - Forms -->
+      <div class="form-section">
+        
+        <!-- Shipping Address -->
+        <div class="form-group">
+          <h3>
+            <i class="fas fa-shipping-fast"></i>
+            Shipping Address
+          </h3>
+          
+          <div class="form-row">
+            <div class="form-field full-width">
+              <label for="fullName">Full Name *</label>
+              <input 
+                type="text" 
+                id="fullName"
+                formControlName="fullName"
+                [class.error]="isFieldInvalid('fullName')"
+                placeholder="Enter your full name">
+              <span class="error-message" *ngIf="isFieldInvalid('fullName')">
+                {{ getFieldError('fullName') }}
+              </span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field full-width">
+              <label for="addressLine1">Address Line 1 *</label>
+              <input 
+                type="text" 
+                id="addressLine1"
+                formControlName="addressLine1"
+                [class.error]="isFieldInvalid('addressLine1')"
+                placeholder="Street address, P.O. box">
+              <span class="error-message" *ngIf="isFieldInvalid('addressLine1')">
+                {{ getFieldError('addressLine1') }}
+              </span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field full-width">
+              <label for="addressLine2">Address Line 2</label>
+              <input 
+                type="text" 
+                id="addressLine2"
+                formControlName="addressLine2"
+                placeholder="Apartment, suite, unit, building (optional)">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="city">City *</label>
+              <input 
+                type="text" 
+                id="city"
+                formControlName="city"
+                [class.error]="isFieldInvalid('city')"
+                placeholder="City">
+              <span class="error-message" *ngIf="isFieldInvalid('city')">
+                {{ getFieldError('city') }}
+              </span>
+            </div>
+            
+            <div class="form-field">
+              <label for="state">State *</label>
+              <select 
+                id="state"
+                formControlName="state"
+                [class.error]="isFieldInvalid('state')">
+                <option value="">Select State</option>
+                <option value="AL">Alabama</option>
+                <option value="CA">California</option>
+                <option value="FL">Florida</option>
+                <option value="NY">New York</option>
+                <option value="TX">Texas</option>
+                <!-- Add more states as needed -->
+              </select>
+              <span class="error-message" *ngIf="isFieldInvalid('state')">
+                {{ getFieldError('state') }}
+              </span>
+            </div>
+            
+            <div class="form-field">
+              <label for="zipCode">ZIP Code *</label>
+              <input 
+                type="text" 
+                id="zipCode"
+                formControlName="zipCode"
+                [class.error]="isFieldInvalid('zipCode')"
+                placeholder="12345">
+              <span class="error-message" *ngIf="isFieldInvalid('zipCode')">
+                {{ getFieldError('zipCode') }}
+              </span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label for="country">Country *</label>
+              <select 
+                id="country"
+                formControlName="country"
+                [class.error]="isFieldInvalid('country')">
+                <option value="United States">United States</option>
+                <option value="Canada">Canada</option>
+              </select>
+            </div>
+            
+            <div class="form-field">
+              <label for="phoneNumber">Phone Number *</label>
+              <input 
+                type="tel" 
+                id="phoneNumber"
+                formControlName="phoneNumber"
+                [class.error]="isFieldInvalid('phoneNumber')"
+                placeholder="+1 (555) 123-4567">
+              <span class="error-message" *ngIf="isFieldInvalid('phoneNumber')">
+                {{ getFieldError('phoneNumber') }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="form-group">
+          <h3>
+            <i class="fas fa-credit-card"></i>
+            Payment Method
+          </h3>
+          
+          <div class="payment-methods">
+            <label class="payment-option">
+              <input type="radio" formControlName="paymentMethod" value="stripe" checked>
+              <span class="checkmark"></span>
+              <div class="payment-info">
+                <span class="payment-title">Credit/Debit Card</span>
+                <div class="card-icons">
+                  <i class="fab fa-cc-visa"></i>
+                  <i class="fab fa-cc-mastercard"></i>
+                  <i class="fab fa-cc-amex"></i>
+                  <i class="fab fa-cc-discover"></i>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <!-- Stripe Card Element -->
+          <div class="card-element-container">
+            <label for="card-element">Card Information *</label>
+            <div id="card-element" class="card-element">
+              <!-- Stripe Elements will create form elements here -->
+            </div>
+            <div class="security-note">
+              <i class="fas fa-lock"></i>
+              Your payment information is encrypted and secure
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column - Order Summary -->
+      <div class="order-summary">
+        <h3>Order Summary</h3>
+        
+        <!-- Items -->
+        <div class="summary-items">
+          <div class="summary-item" *ngFor="let item of cart.items">
+            <img [src]="item.productImage || 'assets/images/default-product.svg'" 
+                 [alt]="item.productName"
+                 onerror="this.src='assets/images/default-product.svg'">
+            <div class="item-details">
+              <h4>{{ item.productName }}</h4>
+              <p class="item-attributes">
+                <span *ngIf="item.size">Size: {{ item.size }}</span>
+                <span *ngIf="item.color">Color: {{ item.color }}</span>
+              </p>
+              <p class="item-quantity">Qty: {{ item.quantity }}</p>
+            </div>
+            <div class="item-price">
+              {{ (item.price * item.quantity) | currency:'USD':'symbol':'1.2-2' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="summary-totals">
+          <div class="total-line">
+            <span>Subtotal ({{ cart.totalItems }} items)</span>
+            <span>{{ subtotal | currency:'USD':'symbol':'1.2-2' }}</span>
+          </div>
+          
+          <div class="total-line">
+            <span>Tax</span>
+            <span>{{ tax | currency:'USD':'symbol':'1.2-2' }}</span>
+          </div>
+          
+          <div class="total-line">
+            <span>Shipping</span>
+            <span *ngIf="shipping === 0" class="free">FREE</span>
+            <span *ngIf="shipping > 0">{{ shipping | currency:'USD':'symbol':'1.2-2' }}</span>
+          </div>
+          
+          <div class="total-line grand-total">
+            <span><strong>Total</strong></span>
+            <span><strong>{{ total | currency:'USD':'symbol':'1.2-2' }}</strong></span>
+          </div>
+        </div>
+
+        <!-- Place Order Button -->
+        <button 
+          type="submit"
+          class="place-order-btn"
+          [disabled]="!checkoutForm.valid || processing"
+          [class.processing]="processing">
+          
+          <span *ngIf="!processing">
+            <i class="fas fa-lock"></i>
+            Place Order
+          </span>
+          
+          <span *ngIf="processing">
+            <i class="fas fa-spinner fa-spin"></i>
+            Processing...
+          </span>
+        </button>
+
+        <div class="trust-badges">
+          <div class="trust-badge">
+            <i class="fas fa-shield-alt"></i>
+            <span>Secure Payment</span>
+          </div>
+          <div class="trust-badge">
+            <i class="fas fa-truck"></i>
+            <span>Free Shipping $50+</span>
+          </div>
+          <div class="trust-badge">
+            <i class="fas fa-undo"></i>
+            <span>30-Day Returns</span>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>

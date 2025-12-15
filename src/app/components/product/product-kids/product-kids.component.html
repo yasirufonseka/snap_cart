@@ -1,0 +1,90 @@
+<section>
+  <div class="container">
+    <h1 class="fs-2">{{Category_Name}}</h1>
+    <p>{{search_result}}</p>
+  </div>
+
+  <div class="container d-flex flex-row align-items-center gap-3">
+    <p class="fs-3">Popular brands :</p>
+    <p class="fs-5 ">{{Popular_brands.join(', ')}}</p>
+
+  </div>
+  <div class="container flex-column d-flex rounded  gap-3 my-3">
+    <div *ngIf="loading" class="loading">Loading products...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+
+    <div class="products-container d-flex flex-wrap gap-3" *ngIf="products.length > 0">
+      <div *ngFor="let product of products" class="product-card card shadow-sm" style="width: 18rem;">
+        <div class="image-container" (click)="openModal(product)" data-bs-toggle="modal" data-bs-target="#productModal">
+          <img [src]="product.images[0]" alt="{{ product.brand }}" class="product-image image-container img-fluid rounded object-fit-cover p-3" style="height: 15rem;">
+        </div>
+        <div class="product-details p-3 d-flex flex-column justify-content-between ">
+          <h5 class="product-brand">{{ product.brand }}</h5>
+          <p class="product-price">Rs. {{ product.price }} <span class="badge bg-danger ms-2">{{ product.discount }}% Off</span></p>
+          <p class="product-size">Size: {{ product.size }}</p>
+          <p class="product-color">Color: {{ product.colour }}</p>
+          <p class="product-condition">Condition: {{ product.condition }}</p>
+          <div class="d-grid gap-2 my-3">
+            <button class="btn btn-warning">Buy Now</button>
+            <button class="btn btn-outline-dark">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && products.length === 0" class="no-products">
+      No products found
+    </div>
+    
+  </div>
+</section>
+<section>
+  <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content p-3">
+        <div class="modal-header">
+          <h5 class="modal-title" id="productModalLabel">{{ selectedProduct?.brand }} - {{ selectedProduct?.items }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body d-flex flex-column flex-md-row">
+          <!-- Swipeable Images Carousel -->
+          <div class="col-md-6 text-center">
+            <div id="productImagesCarousel" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner">
+                <div *ngFor="let img of selectedProduct?.images; let i = index" class="carousel-item" [class.active]="i === 0">
+                  <img [src]="img" class="d-block w-100 rounded mb-3" style="max-height: 350px; object-fit: contain;" alt="Product image">
+                </div>
+              </div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#productImagesCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button class="carousel-control-next" type="button" data-bs-target="#productImagesCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+            <div class="mt-2">
+              <i class="bi bi-heart"></i>
+            </div>
+          </div>
+          <!-- Product Details -->
+          <div class="col-md-6 ps-3">
+            <h5 class="fw-bold">{{ selectedProduct?.brand }} {{ selectedProduct?.items }}</h5>
+            <p><span class="fw-bold">Rs. {{ selectedProduct?.price }}</span> <span class="badge bg-danger ms-2">{{ selectedProduct?.discount }}% Off</span></p>
+            <p><strong>Size:</strong> {{ selectedProduct?.size }}</p>
+            <p><strong>Serial No:</strong> {{ selectedProduct?.serialNo }}</p>
+            <p class="d-flex flex-row"><strong>Color:</strong><span  [ngStyle]="{'background-color': selectedProduct?.colour , 'border': '1px solid #000'}" class="color-box d-grid ms-2 me-2 py-1 px-2 "></span> {{ selectedProduct?.colour }}</p>
+            <p><strong>Condition:</strong> {{ selectedProduct?.condition }}</p>
+            <p><strong>Description:</strong> {{ selectedProduct?.description }}</p>
+            <p><strong>City:</strong> {{ selectedProduct?.city }}</p>
+            <div class="d-grid gap-2 my-3">
+              <button class="btn btn-warning">Buy Now</button>
+              <button class="btn btn-outline-dark">Add to Cart</button>
+            </div>
+            <small class="text-muted">All purchases through Snap Cart covered by Buyer Protection.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

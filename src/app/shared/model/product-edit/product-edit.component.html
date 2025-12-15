@@ -1,0 +1,265 @@
+<section>
+  <form [formGroup]="editProductForm" (ngSubmit)="onSubmit()">
+    <div class="container my-5">
+      <div class="card shadow p-5">
+        <h4 class="mb-4">{{ isEditMode ? 'Edit Listing' : 'Create Listing' }}</h4>
+
+        <!-- Loading Spinner -->
+        <div *ngIf="isLoading" class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+
+        <div *ngIf="!isLoading">
+          <!-- Photos Section -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">Photos</label>
+            <div class="row g-3">
+              <div class="col-6 col-md-4 col-lg-2" *ngFor="let photo of photos; let i = index">
+                <div class="photo-box" (click)="selectPhoto(i)">
+                  <span *ngIf="!photo.preview">{{ photo.label }}</span>
+                  <img *ngIf="photo.preview" [src]="photo.preview" class="img-fluid" alt="Product photo" />
+                  <input type="file" accept="image/*" (change)="onFileChange($event, i)" hidden #fileInput>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">Description <span class="text-danger">*</span></label>
+            <textarea 
+              class="form-control" 
+              formControlName="description" 
+              rows="3" 
+              placeholder="Write about your item..."
+              name="description"
+              [class.is-invalid]="f['description']?.touched && f['description']?.invalid">
+            </textarea>
+            <div class="invalid-feedback d-block" *ngIf="f['description']?.touched && f['description']?.invalid">
+              Description is required
+            </div>
+          </div>
+
+          <!-- Info Section -->
+          <h5 class="fw-bold mb-3">Info</h5>
+          <div class="row g-3 mb-4">
+            <!-- Product Category -->
+            <div class="col-md-6">
+              <label class="form-label">Product For <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                formControlName="collection"
+                (change)="onSelectCategory($event)"
+                name="collection"
+                [class.is-invalid]="f['collection']?.touched && f['collection']?.invalid">
+                <option value="">Select category...</option>
+                <option *ngFor="let cat of mainCategory" [value]="cat">{{ cat }}</option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="f['collection']?.touched && f['collection']?.invalid">
+                Product category is required
+              </div>
+            </div>
+
+            <!-- Item Category -->
+            <div class="col-md-6">
+              <label class="form-label">Item Category <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                formControlName="items"
+                name="subCategory"
+                [class.is-invalid]="f['items']?.touched && f['items']?.invalid">
+                <option value="">Select sub category...</option>
+                <option *ngFor="let cat of subcat" [value]="cat">{{ cat }}</option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="f['items']?.touched && f['items']?.invalid">
+                Item category is required
+              </div>
+            </div>
+
+            <!-- Condition -->
+            <div class="col-md-6">
+              <label class="form-label">Condition <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                formControlName="condition"
+                name="condition"
+                [class.is-invalid]="f['condition']?.touched && f['condition']?.invalid">
+                <option value="">Select condition...</option>
+                <option value="New">New</option>
+                <option value="Used">Used</option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="f['condition']?.touched && f['condition']?.invalid">
+                Condition is required
+              </div>
+            </div>
+
+            <!-- Brand -->
+            <div class="col-md-6">
+              <label class="form-label">Brand <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                formControlName="brand" 
+                placeholder="Enter brand"
+                name="brand"
+                [class.is-invalid]="f['brand']?.touched && f['brand']?.invalid">
+              <div class="invalid-feedback d-block" *ngIf="f['brand']?.touched && f['brand']?.invalid">
+                Brand is required
+              </div>
+            </div>
+
+            <!-- Serial No -->
+            <div class="col-md-6">
+              <label class="form-label">Serial No</label>
+              <input 
+                type="text" 
+                class="form-control" 
+                formControlName="serialNo" 
+                placeholder="Enter serial number"
+                name="serialNo">
+            </div>
+          </div>
+
+          <!-- Enhance Your Listing -->
+          <h5 class="fw-bold mb-3">Enhance your listing</h5>
+          <div class="row g-3 mb-4">
+            <!-- Colour -->
+            <div class="col-md-6">
+              <label class="form-label">Colour <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                formControlName="colour" 
+                placeholder="Enter colour"
+                name="colour"
+                [class.is-invalid]="f['colour']?.touched && f['colour']?.invalid">
+              <div class="invalid-feedback d-block" *ngIf="f['colour']?.touched && f['colour']?.invalid">
+                Colour is required
+              </div>
+            </div>
+
+            <!-- Occasion -->
+            <div class="col-md-6">
+              <label class="form-label">Occasion</label>
+              <select 
+                class="form-select" 
+                formControlName="occasion"
+                name="occasion">
+                <option value="">Select occasion...</option>
+                <option value="Party">Party</option>
+                <option value="Casual">Casual</option>
+                <option value="Formal">Formal</option>
+                <option value="Beach wear">Beach wear</option>
+              </select>
+            </div>
+
+            <!-- Size -->
+            <div class="col-md-6">
+              <label class="form-label">Size <span class="text-danger">*</span></label>
+              <select 
+                class="form-select" 
+                formControlName="size"
+                name="size"
+                [class.is-invalid]="f['size']?.touched && f['size']?.invalid">
+                <option value="">Select size...</option>
+                <option value="Small">Small</option>
+                <option value="Medium">Medium</option>
+                <option value="Large">Large</option>
+                <option value="Extra Large">Extra Large</option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="f['size']?.touched && f['size']?.invalid">
+                Size is required
+              </div>
+            </div>
+
+            <!-- Age -->
+            <div class="col-md-6">
+              <label class="form-label">Age (years)</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                formControlName="age" 
+                placeholder="Enter age"
+                name="age"
+                min="0">
+            </div>
+          </div>
+
+          <!-- Location -->
+          <h5 class="fw-bold mb-3">Location</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label">City <span class="text-danger">*</span></label>
+              <input 
+                type="text" 
+                class="form-control" 
+                formControlName="city" 
+                placeholder="Enter city"
+                name="city"
+                [class.is-invalid]="f['city']?.touched && f['city']?.invalid">
+              <div class="invalid-feedback d-block" *ngIf="f['city']?.touched && f['city']?.invalid">
+                City is required
+              </div>
+            </div>
+          </div>
+
+          <!-- Price Section -->
+          <h5 class="fw-bold mb-3">Price</h5>
+          <div class="row g-3 mb-4">
+            <!-- Price -->
+            <div class="col-md-6">
+              <label class="form-label">Price <span class="text-danger">*</span></label>
+              <input 
+                type="number" 
+                class="form-control" 
+                formControlName="price" 
+                placeholder="Enter price"
+                name="price"
+                min="0"
+                [class.is-invalid]="f['price']?.touched && f['price']?.invalid">
+              <div class="invalid-feedback d-block" *ngIf="f['price']?.touched && f['price']?.invalid">
+                <span *ngIf="f['price']?.errors?.['required']">Price is required</span>
+                <span *ngIf="f['price']?.errors?.['min']">Price must be greater than 0</span>
+              </div>
+            </div>
+
+            <!-- Discount -->
+            <div class="col-md-6">
+              <label class="form-label">Discount (%)</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                formControlName="discount" 
+                placeholder="Enter discount %"
+                name="discount"
+                min="0"
+                max="100"
+                [class.is-invalid]="f['discount']?.touched && f['discount']?.invalid">
+              <div class="invalid-feedback d-block" *ngIf="f['discount']?.touched && f['discount']?.invalid">
+                Discount must be between 0 and 100
+              </div>
+            </div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="d-flex justify-content-between gap-2">
+            <button 
+              type="button" 
+              class="btn btn-outline-secondary" 
+              (click)="onCancel()"
+              [disabled]="isLoading">
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-success" 
+              [disabled]="isLoading || editProductForm.invalid">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              {{ isEditMode ? 'Update Product' : 'Create Listing' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</section>

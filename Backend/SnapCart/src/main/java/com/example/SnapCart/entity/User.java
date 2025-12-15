@@ -38,6 +38,25 @@ public class User {
     private String username;
     @NotBlank
     private String password;
-
+    
+    // Additional fields for settings
+    private String profileImage;
+    private boolean isActive = true;
+    private String role = "user";
+    
+    // System preferences
+    private boolean emailNotifications = true;
+    private boolean smsNotifications = false;
+    private boolean pushNotifications = true;
+    private String language = "en";
+    private String timezone = "UTC";
+    private String theme = "light";
+    private boolean twoFactorEnabled = false;
+    
+    // Timestamps
+    @CreatedDate
+    private Date createdAt = new Date();
+    private Date updatedAt = new Date();
+    private Date lastLoginAt;
 
 }

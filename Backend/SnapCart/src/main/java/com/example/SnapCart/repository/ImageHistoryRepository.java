@@ -1,0 +1,12 @@
+package com.example.SnapCart.repository;
+
+import com.example.SnapCart.entity.ImageHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ImageHistoryRepository extends JpaRepository<ImageHistory, Long> {
+    List<ImageHistory> findTop10ByOrderByCreatedAtDesc();
+}

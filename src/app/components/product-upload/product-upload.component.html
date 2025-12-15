@@ -1,0 +1,160 @@
+<div class="product-upload-container">
+  <div class="upload-card">
+    <h2 class="title">🤖 AI-Powered Product Upload</h2>
+    <p class="subtitle">Upload a product image and let AI auto-fill the details!</p>
+
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Step 1: Upload Image -->
+    <div *ngIf="step === 'upload'" class="upload-section">
+      <div class="image-upload-area">
+        <input type="file" id="imageInput" (change)="onImageSelected($event)" accept="image/*" hidden />
+
+        <label for="imageInput" class="upload-label">
+          <div *ngIf="!imagePreview" class="upload-placeholder">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <p>Click to upload product image</p>
+            <span>PNG, JPG up to 10MB</span>
+          </div>
+
+          <img *ngIf="imagePreview" [src]="imagePreview" alt="Product preview" class="preview-image" />
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>Price (Required) *</label>
+        <input type="number" [(ngModel)]="productData.price" placeholder="Enter price" min="0" class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label>Discount (%)</label>
+        <input type="number" [(ngModel)]="productData.discount" placeholder="Enter discount percentage" min="0"
+          max="100" class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label>Brand (Optional)</label>
+        <input type="text" [(ngModel)]="productData.brand" placeholder="Enter brand name" class="form-input" />
+      </div>
+
+      <div class="form-group">
+        <label>City (Optional)</label>
+        <input type="text" [(ngModel)]="productData.city" placeholder="Enter city" class="form-input" />
+      </div>
+
+      <button (click)="analyzeImage()" [disabled]="isAnalyzing || !imagePreview || !productData.price"
+        class="btn btn-primary">
+        <span *ngIf="!isAnalyzing">🔍 Analyze with AI</span>
+        <span *ngIf="isAnalyzing">🔄 Analyzing...</span>
+      </button>
+
+      <button (click)="quickUpload()" [disabled]="isCreating || !imagePreview || !productData.price"
+        class="btn btn-secondary">
+        <span *ngIf="!isCreating">⚡ Quick Upload (Auto-fill & Create)</span>
+        <span *ngIf="isCreating">⏳ Uploading...</span>
+      </button>
+    </div>
+
+    <!-- Step 2: Review AI Suggestions -->
+    <div *ngIf="step === 'review'" class="review-section">
+      <h3 class="section-title">📋 Review & Edit Product Details</h3>
+
+      <!-- AI Suggestions Box -->
+      <div *ngIf="aiSuggestions" class="ai-suggestions-box">
+        <h4>🤖 AI Detected:</h4>
+        <div class="suggestion-grid">
+          <div class="suggestion-item">
+            <strong>Category:</strong>
+            <span class="badge">{{ aiSuggestions.category }}</span>
+          </div>
+          <div class="suggestion-item">
+            <strong>Confidence:</strong>
+            <span class="confidence">{{ aiSuggestions.confidenceScore }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editable Form -->
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" [(ngModel)]="productData.productName" placeholder="Product name" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Gender *</label>
+          <select [(ngModel)]="productData.gender" class="form-input">
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Unisex">Unisex</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Occasion *</label>
+          <select [(ngModel)]="productData.occasion" class="form-input">
+            <option value="">Select Occasion</option>
+            <option value="Wedding">Wedding</option>
+            <option value="Party">Party</option>
+            <option value="Casual">Casual</option>
+            <option value="Office">Office</option>
+            <option value="Traditional">Traditional</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Item Type *</label>
+          <input type="text" [(ngModel)]="productData.items" placeholder="e.g., Sherwani, Dress, Shirt"
+            class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Color</label>
+          <input type="text" [(ngModel)]="productData.colour" placeholder="e.g., Black, White, Blue"
+            class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Style</label>
+          <input type="text" [(ngModel)]="productData.style" placeholder="e.g., Luxury, Casual, Formal"
+            class="form-input" />
+        </div>
+
+        <div class="form-group full-width">
+          <label>Description</label>
+          <textarea [(ngModel)]="productData.description" placeholder="Product description" rows="4"
+            class="form-input"></textarea>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button (click)="resetForm()" class="btn btn-secondary">
+          ← Start Over
+        </button>
+        <button (click)="createProduct()" [disabled]="isCreating" class="btn btn-success">
+          <span *ngIf="!isCreating">✅ Create Product</span>
+          <span *ngIf="isCreating">⏳ Creating...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div *ngIf="step === 'success'" class="success-section">
+      <div class="success-icon">✅</div>
+      <h3>Product Created Successfully!</h3>
+      <p>{{ successMessage }}</p>
+      <button (click)="resetForm()" class="btn btn-primary">
+        Upload Another Product
+      </button>
+    </div>
+  </div>
+</div>
