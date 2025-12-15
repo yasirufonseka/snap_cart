@@ -1,0 +1,198 @@
+{
+  "clientName": "Thunder Client",
+  "dateExported": "2025-11-11T00:00:00.000Z",
+  "version": "1.1",
+  "folders": [
+    {
+      "name": "Dashboard APIs",
+      "requests": [
+        {
+          "name": "Get Products by Seller",
+          "method": "GET",
+          "url": "http://localhost:8080/api/dashboard/seller/seller123",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [],
+          "params": [],
+          "body": {},
+          "tests": [],
+          "docs": "Get all products listed by a specific seller. Replace 'seller123' with the actual seller ID."
+        },
+        {
+          "name": "Get Seller Statistics",
+          "method": "GET",
+          "url": "http://localhost:8080/api/dashboard/stats/seller/seller123",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [],
+          "params": [],
+          "body": {},
+          "tests": [],
+          "docs": "Get statistics for a seller including total products, active listed, sold, draft, and total value."
+        },
+        {
+          "name": "Update Product",
+          "method": "PUT",
+          "url": "http://localhost:8080/api/dashboard/product_id_here",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "params": [],
+          "body": {
+            "raw": "{\n  \"id\": \"product_id_here\",\n  \"images\": [\"image_url_1\", \"image_url_2\"],\n  \"description\": \"Updated product description\",\n  \"collection\": \"Men\",\n  \"items\": \"Shoes\",\n  \"brand\": \"Nike\",\n  \"condition\": \"New\",\n  \"serialNo\": \"SN123456\",\n  \"age\": 0,\n  \"colour\": \"Black\",\n  \"gender\": \"Male\",\n  \"occasion\": \"Sports\",\n  \"size\": \"10\",\n  \"city\": \"New York\",\n  \"price\": 129.99,\n  \"discount\": 10,\n  \"status\": \"available\",\n  \"sellerId\": \"seller123\"\n}"
+          },
+          "tests": [],
+          "docs": "Update an existing product. Replace 'product_id_here' with the actual product MongoDB ID."
+        },
+        {
+          "name": "Delete Product",
+          "method": "DELETE",
+          "url": "http://localhost:8080/api/dashboard/product_id_here",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [],
+          "params": [],
+          "body": {},
+          "tests": [],
+          "docs": "Delete a product by ID. Replace 'product_id_here' with the actual product MongoDB ID."
+        },
+        {
+          "name": "Mark Product as Sold",
+          "method": "PUT",
+          "url": "http://localhost:8080/api/dashboard/product_id_here/sold",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [],
+          "params": [],
+          "body": {},
+          "tests": [],
+          "docs": "Mark a product as sold. Replace 'product_id_here' with the actual product MongoDB ID."
+        }
+      ]
+    },
+    {
+      "name": "Product APIs (General)",
+      "requests": [
+        {
+          "name": "Create Product",
+          "method": "POST",
+          "url": "http://localhost:8080/api/SaveProduct",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "params": [],
+          "body": {
+            "raw": "{\n  \"images\": [\"https://example.com/image1.jpg\", \"https://example.com/image2.jpg\"],\n  \"description\": \"Brand new Nike Air Max shoes in excellent condition\",\n  \"collection\": \"Men\",\n  \"items\": \"Shoes\",\n  \"brand\": \"Nike\",\n  \"condition\": \"New\",\n  \"serialNo\": \"SN123456\",\n  \"age\": 0,\n  \"colour\": \"Black\",\n  \"gender\": \"Male\",\n  \"occasion\": \"Sports\",\n  \"size\": \"10\",\n  \"city\": \"New York\",\n  \"price\": 129.99,\n  \"discount\": 10,\n  \"status\": \"available\",\n  \"sellerId\": \"seller123\"\n}"
+          },
+          "tests": [],
+          "docs": "Create a new product. The 'sellerId' is the ID of the seller listing the product."
+        },
+        {
+          "name": "Get Product by ID",
+          "method": "GET",
+          "url": "http://localhost:8080/api/GetProduct/ById/product_id_here",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [],
+          "params": [],
+          "body": {},
+          "tests": [],
+          "docs": "Get a specific product by its ID. Replace 'product_id_here' with the actual product MongoDB ID."
+        },
+        {
+          "name": "Get Products by Collection",
+          "method": "GET",
+          "url": "http://localhost:8080/api/GetProduct/ByCollection/Men",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [],
+          "params": [],
+          "body": {},
+          "tests": [],
+          "docs": "Get all products in a specific collection. Replace 'Men' with the desired collection name."
+        },
+        {
+          "name": "Get Products by Items",
+          "method": "GET",
+          "url": "http://localhost:8080/api/GetProduct/ByItems/Shoes",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [],
+          "params": [],
+          "body": {},
+          "tests": [],
+          "docs": "Get all products with a specific item type. Replace 'Shoes' with the desired item name."
+        }
+      ]
+    },
+    {
+      "name": "Authentication APIs",
+      "requests": [
+        {
+          "name": "Sign Up",
+          "method": "POST",
+          "url": "http://localhost:8080/api/CreateUser",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "params": [],
+          "body": {
+            "raw": "{\n  \"username\": \"testuser\",\n  \"email\": \"test@example.com\",\n  \"password\": \"Password123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"city\": \"New York\",\n  \"state\": \"NY\",\n  \"userRole\": \"seller\"\n}"
+          },
+          "tests": [],
+          "docs": "Create a new user account. userRole can be 'seller' or 'buyer'."
+        },
+        {
+          "name": "Sign In",
+          "method": "POST",
+          "url": "http://localhost:8080/api/login",
+          "auth": {
+            "type": "none"
+          },
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "params": [],
+          "body": {
+            "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Password123\"\n}"
+          },
+          "tests": [],
+          "docs": "Log in with username and password. Returns user ID if successful."
+        }
+      ]
+    }
+  ],
+  "variables": {
+    "base_url": "http://localhost:8080/api",
+    "seller_id": "seller123",
+    "product_id": "product_id_here"
+  }
+}

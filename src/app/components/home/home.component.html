@@ -2,15 +2,16 @@
 <app-carousal></app-carousal>
 <app-ad-card></app-ad-card>
 <app-product-showcase></app-product-showcase>
+<app-ai-chatbot></app-ai-chatbot>
 
 <!-- add button for AI chat bot -->
-<button
+<!-- <button
     type="button"
     class="btn btn-primary position-fixed"
     style="bottom: 20px; right: 20px; border-radius: 50%; width: 60px; height: 60px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); z-index: 1050;"
     data-bs-toggle="modal"
     data-bs-target="#chatModal"
-    >💬</button>
+    >💬</button> -->
 
 <!-- Chat Modal -->
 <div
@@ -44,28 +45,72 @@
             <div class="cards align-self-center p-4 text-center rounded-3 bg-white shadow-sm cursor-pointer" 
                  style="width: 15rem; transition: transform 0.3s;" 
                  onmouseover="this.style.transform='scale(1.05)'" 
-                 onmouseout="this.style.transform='scale(1)'">
+                 onmouseout="this.style.transform='scale(1)'"
+                 (click)="filterProductsByPrice(500)">
                 <p class="fs-2 mb-0">Under <span class="fw-bold text-success">Rs. 500</span></p>
             </div>
             <div class="cards align-self-center p-4 text-center rounded-3 bg-white shadow-sm cursor-pointer" 
                  style="width: 15rem; transition: transform 0.3s;" 
                  onmouseover="this.style.transform='scale(1.05)'" 
-                 onmouseout="this.style.transform='scale(1)'">
+                 onmouseout="this.style.transform='scale(1)'"
+                 (click)="filterProductsByPrice(1000)">
                 <p class="fs-2 mb-0">Under <span class="fw-bold text-success">Rs. 1000</span></p>
             </div>
             <div class="cards align-self-center p-4 text-center rounded-3 bg-white shadow-sm cursor-pointer" 
                  style="width: 15rem; transition: transform 0.3s;" 
                  onmouseover="this.style.transform='scale(1.05)'" 
-                 onmouseout="this.style.transform='scale(1)'">
+                 onmouseout="this.style.transform='scale(1)'"
+                 (click)="filterProductsByPrice(2000)">
                 <p class="fs-2 mb-0">Under <span class="fw-bold text-success">Rs. 2000</span></p>
             </div>
             <div class="cards align-self-center p-4 text-center rounded-3 bg-white shadow-sm cursor-pointer" 
                  style="width: 15rem; transition: transform 0.3s;" 
                  onmouseover="this.style.transform='scale(1.05)'" 
-                 onmouseout="this.style.transform='scale(1)'">
+                 onmouseout="this.style.transform='scale(1)'"
+                 (click)="filterProductsByPrice(5000)">
                 <p class="fs-2 mb-0">Under <span class="fw-bold text-success">Rs. 5000</span></p>
             </div>
         </div>
+    </div>
+</section>
+
+<!-- Filtered Products Section (hidden until filter is applied) -->
+<section class="p-5" *ngIf="selectedPriceRange > 0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fs-2 fw-bold">Products Under Rs. {{ selectedPriceRange }}</h2>
+            <p class="fs-6 text-muted" *ngIf="filteredProducts.length > 0">{{ filteredProducts.length }} product(s) found</p>
+            <p class="fs-6 text-muted" *ngIf="filteredProducts.length === 0">No products found in this price range</p>
+        </div>
+        <button class="btn btn-outline-secondary" (click)="clearFilter()">
+            <i class="bi bi-x-circle"></i> Clear Filter
+        </button>
+    </div>
+    
+    <div class="row g-4" *ngIf="filteredProducts.length > 0">
+        <div class="col-lg-3 col-md-4 col-sm-6" *ngFor="let product of filteredProducts">
+            <div class="card h-100 shadow-sm hover-effect" style="cursor: pointer;" (click)="onProductClick(product)">
+                <img [src]="getProductImage(product)" 
+                     [alt]="getProductName(product)" 
+                     class="card-img-top" 
+                     style="height: 200px; object-fit: cover;"
+                     (error)="onImageError($event)">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ getProductName(product) }}</h5>
+                    <p class="card-text text-muted small flex-grow-1">{{ getProductDescription(product) }}</p>
+                    <div class="mt-auto">
+                        <h6 class="text-success fw-bold mb-0">Rs. {{ getProductPrice(product) }}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- No products found message -->
+    <div class="text-center py-5" *ngIf="filteredProducts.length === 0">
+        <i class="bi bi-search fs-1 text-muted mb-3"></i>
+        <h4 class="text-muted">No Products Found</h4>
+        <p class="text-muted">No products found under Rs. {{ selectedPriceRange }}. Try a higher price range.</p>
     </div>
 </section>
 
@@ -91,7 +136,7 @@
                                  (mouseleave)="hideOverlay($event)">
                                 <div class="text-center text-white">
                                     <h6 class="mb-1">{{ getProductName(product) }}</h6>
-                                    <p class="mb-0 fw-bold">${{ getProductPrice(product) }}</p>
+                                    <p class="mb-0 fw-bold">LKR.{{ getProductPrice(product) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +157,7 @@
                          (mouseleave)="hideOverlay($event)">
                         <div class="text-center text-white">
                             <h4 class="mb-2">{{ getProductName(featuredProducts[9]) }}</h4>
-                            <p class="mb-0 fs-3 fw-bold">${{ getProductPrice(featuredProducts[9]) }}</p>
+                            <p class="mb-0 fs-3 fw-bold">LKR.{{ getProductPrice(featuredProducts[9]) }}</p>
                             <p class="mb-0 mt-2">Featured Product</p>
                         </div>
                     </div>

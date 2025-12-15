@@ -77,7 +77,7 @@
             <p><strong>Description:</strong> {{ selectedProduct?.description }}</p>
             <p><strong>City:</strong> {{ selectedProduct?.city }}</p>
             <div class="d-grid gap-2 my-3">
-              <button class="btn btn-warning">Buy Now</button>
+              <button class="btn btn-warning" (click)="openSellerModal()" data-bs-toggle="modal" data-bs-target="#sellerInfoModal">Buy Now</button>
               <button class="btn btn-outline-dark">Add to Cart</button>
             </div>
             <small class="text-muted">All purchases through Snap Cart covered by Buyer Protection.</small>
@@ -86,3 +86,104 @@
       </div>
     </div>
   </div>
+</section>
+  </div>
+</section>
+
+<!-- Seller Information Modal -->
+<section>
+  <div class="modal fade" id="sellerInfoModal" tabindex="-1" aria-labelledby="sellerInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="sellerInfoModalLabel">
+            <i class="bi bi-person-badge me-2"></i>Seller Information
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Product Info Header -->
+          <div class="d-flex align-items-center mb-4 p-3 bg-light rounded">
+            <img [src]="selectedProduct?.images?.[0] || '/assets/placeholder.jpg'" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;" alt="Product">
+            <div>
+              <h6 class="mb-1 fw-bold">{{ selectedProduct?.brand }} {{ selectedProduct?.items }}</h6>
+              <p class="mb-0 text-muted">Rs. {{ selectedProduct?.price }}</p>
+            </div>
+          </div>
+
+          <!-- Seller Details -->
+          <div class="seller-details">
+            <h6 class="mb-3 text-primary">
+              <i class="bi bi-shop me-2"></i>Seller Details
+            </h6>
+            
+            <div class="row g-3">
+              <div class="col-12">
+                <div class="d-flex align-items-center p-2 border rounded">
+                  <i class="bi bi-person-circle text-primary me-3 fs-4"></i>
+                  <div>
+                    <small class="text-muted">Seller Name</small>
+                    <p class="mb-0 fw-semibold">{{ selectedProduct?.sellerName || 'John Doe' }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="d-flex align-items-center p-2 border rounded">
+                  <i class="bi bi-envelope text-primary me-3 fs-4"></i>
+                  <div>
+                    <small class="text-muted">Email</small>
+                    <p class="mb-0 fw-semibold">{{ selectedProduct?.sellerEmail || 'seller@example.com' }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="d-flex align-items-center p-2 border rounded">
+                  <i class="bi bi-telephone text-primary me-3 fs-4"></i>
+                  <div>
+                    <small class="text-muted">Contact Number</small>
+                    <p class="mb-0 fw-semibold">{{ selectedProduct?.sellerPhone || '+1 (555) 123-4567' }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12">
+                <div class="d-flex align-items-center p-2 border rounded">
+                  <i class="bi bi-geo-alt text-primary me-3 fs-4"></i>
+                  <div>
+                    <small class="text-muted">Product Location</small>
+                    <p class="mb-0 fw-semibold">{{ selectedProduct?.city }}, {{ selectedProduct?.location || 'State' }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trust Indicators -->
+          <div class="mt-4 p-3 bg-success bg-opacity-10 rounded">
+            <h6 class="text-success mb-2">
+              <i class="bi bi-shield-check me-2"></i>Buyer Protection
+            </h6>
+            <small class="text-muted">
+              This purchase is covered by SnapCart's Buyer Protection policy. 
+              We ensure secure transactions and dispute resolution.
+            </small>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-arrow-left me-2"></i>Back to Product
+          </button>
+          <button type="button" class="btn btn-success">
+            <i class="bi bi-chat-dots me-2"></i>Contact Seller
+          </button>
+          <button type="button" class="btn btn-warning">
+            <i class="bi bi-bag-check me-2"></i>Proceed to Buy
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

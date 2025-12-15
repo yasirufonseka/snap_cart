@@ -55,23 +55,43 @@ export class CookieHandlerService {
 
   /**
    * Check if user is logged in
-   * @returns true if loginStatus cookie exists and is valid
+   * @returns true if userId cookie exists and is valid
    */
   isLoggedIn(): boolean {
-    const loginStatus = this.getCookie('loginStatus');
-    return !!loginStatus && loginStatus !== 'undefined';
+    const userId = this.getCookie('userId');
+    return !!userId && userId !== 'undefined';
   }
 
   /**
-   * Get seller ID from loginStatus cookie
+   * Get user ID from cookies
+   * @returns User ID or undefined
+   */
+  getUserId(): string | undefined {
+    const userId = this.getCookie('userId');
+    if (userId && userId !== 'undefined') {
+      return userId;
+    }
+    return undefined;
+  }
+
+  /**
+   * Get user role from cookies
+   * @returns User role or undefined
+   */
+  getUserRole(): string | undefined {
+    const userRole = this.getCookie('userRole');
+    if (userRole && userRole !== 'undefined') {
+      return userRole;
+    }
+    return undefined;
+  }
+
+  /**
+   * Get seller ID from cookies (alias for getUserId for backward compatibility)
    * @returns Seller ID or undefined
    */
   getSellerId(): string | undefined {
-    const loginStatus = this.getCookie('loginStatus');
-    if (loginStatus && loginStatus !== 'undefined') {
-      return loginStatus;
-    }
-    return undefined;
+    return this.getUserId();
   }
 
   /**
@@ -83,10 +103,86 @@ export class CookieHandlerService {
   }
 
   /**
-   * Logout by clearing login cookies
+   * Get user name from cookies (if stored)
+   * @returns User name or undefined
+   */
+  getUserName(): string | undefined {
+    return this.getCookie('userName');
+  }
+
+  /**
+   * Set login cookies with user ID, username, and role
+   * @param userId - User ID
+   * @param userRole - User role (admin, seller, customer, etc.)
+   * @param userEmail - User email (optional)
+   * @param userName - User name (optional)
+   * @param days - Expiration days (default: 7)
+   */
+  setLoginCookies(userId: string, userRole: string, userEmail?: string, userName?: string, days: number = 7): void {
+    this.setCookie('userId', userId, days);
+    this.setCookie('userRole', userRole, days);
+    // Keep loginStatus for backward compatibility
+    this.setCookie('loginStatus', userId, days);
+    
+    if (userEmail) {
+      this.setCookie('userEmail', userEmail, days);
+    }
+    
+    if (userName) {
+      this.setCookie('userName', userName, days);
+    }
+  }
+
+  /**
+   * Check if user has specific role
+   * @param role - Role to check for
+   * @returns true if user has the specified role
+   */
+  hasRole(role: string): boolean {
+    const userRole = this.getUserRole();
+    return userRole === role;
+  }
+
+  /**
+   * Check if user is admin
+   * @returns true if user role is admin
+   */
+  isAdmin(): boolean {
+    return this.hasRole('admin');
+  }
+
+  /**
+   * Check if user is seller
+   * @returns true if user role is seller
+   */
+  isSeller(): boolean {
+    return this.hasRole('seller');
+  }
+
+  /**
+   * Check if user is customer/regular user
+   * @returns true if user role is customer or user
+   */
+  isCustomer(): boolean {
+    return this.hasRole('customer') || this.hasRole('user');
+  }
+
+  /**
+   * Check if user is regular user (alias for isCustomer)
+   * @returns true if user role is customer or user
+   */
+  isUser(): boolean {
+    return this.isCustomer();
+  }
+
+  /**
+   * Logout by clearing all login cookies
    */
   logout(): void {
-    this.deleteCookie('loginStatus');
+    this.deleteCookie('userId');
+    this.deleteCookie('userRole');
     this.deleteCookie('userEmail');
+    this.deleteCookie('userName');
+    this.deleteCookie('loginStatus'); // Keep for backward compatibility
   }
 }

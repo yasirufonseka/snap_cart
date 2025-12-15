@@ -46,21 +46,85 @@
     color: #4a5568;
     text-decoration: none;
     border-radius: 8px;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    margin-bottom: 0.25rem;
     
     i {
       margin-right: 1rem;
       font-size: 1.25rem;
+      transition: all 0.3s ease;
+    }
+    
+    span {
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
     
     &:hover {
       background-color: #f7fafc;
       color: #2d3748;
+      transform: translateX(2px);
+      
+      i {
+        transform: scale(1.1);
+      }
     }
     
     &.active {
-      background-color: #ebf8ff;
-      color: #3182ce;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+      transform: translateX(4px);
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      
+      i {
+        color: #ffffff;
+        transform: scale(1.1);
+      }
+      
+      span {
+        font-weight: 600;
+        color: #ffffff;
+      }
+      
+      &::before {
+        content: '';
+        position: absolute;
+        left: -1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+      }
+    }
+  }
+  
+  .active-indicator {
+    position: absolute;
+    right: 1rem;
+    width: 8px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    animation: pulse-indicator 2s infinite;
+  }
+  
+  @keyframes pulse-indicator {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
     }
   }
 }

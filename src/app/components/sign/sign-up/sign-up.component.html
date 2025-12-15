@@ -42,11 +42,33 @@
                         [ngStyle]="f['password'].touched && f['password'].invalid ? {'border-bottom':'2px solid red'} : {}"
                          class="form-control" id="inputPassword">
 
-                        <!-- <label for="inputPassword" class="col-sm-2 col-form-label">User Type</label>
-                        <Select (change)="onChange($event)" formControlName="userType" class="form-select" aria-label="Default select example">
-                            <option value="Seller" >Seller</option>
-                            <option value="Buyer">Buyer</option> 
-                        </Select> -->
+                        <!-- Account Type Selection -->
+                        <!-- <div class="mt-4">
+                            <label class="form-label fw-semibold">Account Type</label>
+                            <div class="role-selection mt-2 d-flex gap-2">
+                                <div *ngFor="let role of roleOptions" class="form-check role-option-inline flex-fill">
+                                    <input 
+                                        class="form-check-input" 
+                                        type="radio" 
+                                        [value]="role.value" 
+                                        [id]="'role-' + role.value"
+                                        formControlName="role">
+                                    <label class="form-check-label w-100 text-center p-1 border rounded" [for]="'role-' + role.value">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <div class="role-icon-small mb-1">
+                                                <i class="fas fa-user" *ngIf="role.value === 'customer'"></i>
+                                                <i class="fas fa-store" *ngIf="role.value === 'seller'"></i>
+                                                <i class="fas fa-crown" *ngIf="role.value === 'admin'"></i>
+                                            </div>
+                                            <div class="fw-bold small">{{ role.label }}</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div *ngIf="f['role'].touched && f['role'].invalid" class="text-danger small">
+                                Please select an account type
+                            </div>
+                        </div> -->
 
 
                         <button type="submit" class="btn btn-warning mt-5 w-100">Register</button>

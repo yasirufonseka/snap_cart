@@ -6,14 +6,20 @@ import { CarousalComponent } from "../carousal/carousal.component";
 import { ProductShowcaseComponent } from "../product showcase/product-showcase.component";
 import { AdCardComponent } from "../ad-card/ad-card.component";
 import { ChatWidgetComponent } from "../chat-widget/chat-widget.component";
+import { AiChatbotComponent } from "../ai-chatbot/ai-chatbot.component";
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, CarousalComponent, ProductShowcaseComponent, AdCardComponent, ChatWidgetComponent],
+  imports: [CommonModule, CarousalComponent, ProductShowcaseComponent, AdCardComponent, ChatWidgetComponent, AiChatbotComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
 export class HomeComponent implements OnInit {
+  
+  
+  filteredProducts: any[] = [];
+  selectedPriceRange: number = 0;
+
   
   products: any[] = [];
   featuredProducts: any[] = [];
@@ -21,26 +27,33 @@ export class HomeComponent implements OnInit {
   constructor(private http: HttpClient) { }
   
   ngOnInit() {
-    this.loadProducts();
+    //this.loadProducts();
+    this.tryFallbackEndpoint();
   }
   
-  loadProducts() {
-    this.http.get<any[]>('http://localhost:8080/api/GetAllProduct')
-      .subscribe({
-        next: (data) => {
-          console.log('Home component - Products received:', data);
-          if (data && data.length > 0) {
-            this.products = data;
-            // Get first 9 products for the grid
-            this.featuredProducts = data.slice(0, 10);
-          }
-        },
-        error: (error) => {
-          console.error('Home component - Error fetching products:', error);
-          // Fallback to sample data or try alternative endpoint
-          this.tryFallbackEndpoint();
-        }
-      });
+  // loadProducts() {
+  //   this.http.get<any[]>('http://localhost:8080/api/GetAllProduct')
+  //     .subscribe({
+  //       next: (data) => {
+  //         console.log('Home component - Products received:', data);
+  //         if (data && data.length > 0) {
+  //           this.products = data;
+  //           // Get first 9 products for the grid
+  //           this.featuredProducts = data.slice(0, 10);
+  //         }
+  //       },
+  //       error: (error) => {
+  //         console.error('Home component - Error fetching products:', error);
+  //         // Fallback to sample data or try alternative endpoint
+  //         this.tryFallbackEndpoint();
+  //       }
+  //     });
+  // }
+
+   
+
+  getProductDescription(product: any): string {
+    return product?.description || 'No description available';
   }
   
   tryFallbackEndpoint() {
@@ -109,6 +122,44 @@ export class HomeComponent implements OnInit {
     if (target) {
       target.style.opacity = '0';
     }
+  }
+  
+  filterProductsByPrice(maxPrice: number): void {
+    console.log('Filtering products by price:', maxPrice);
+    this.selectedPriceRange = maxPrice;
+    
+    // If products are already loaded, filter from existing data
+    if (this.products && this.products.length > 0) {
+      this.filteredProducts = this.products.filter(product => {
+        const price = this.getProductPrice(product);
+        console.log(`Product: ${this.getProductName(product)}, Price: ${price}, Include: ${price <= maxPrice}`);
+        return price > 0 && price <= maxPrice; // Only include products with valid prices
+      });
+      console.log('Filtered products:', this.filteredProducts.length);
+    } else {
+      // If products not loaded yet, fetch them first
+      this.http.get<any[]>('http://localhost:8080/api/GetAllProduct').subscribe({
+        next: (products) => {
+          console.log('Fetched products for filtering:', products.length);
+          this.products = products;
+          this.filteredProducts = products.filter(product => {
+            const price = this.getProductPrice(product);
+            console.log(`Product: ${this.getProductName(product)}, Price: ${price}, Include: ${price <= maxPrice}`);
+            return price > 0 && price <= maxPrice;
+          });
+          console.log('Filtered products:', this.filteredProducts.length);
+        },
+        error: (error) => {
+          console.error('Error filtering products:', error);
+          this.filteredProducts = [];
+        }
+      });
+    }
+  }
+
+  clearFilter(): void {
+    this.filteredProducts = [];
+    this.selectedPriceRange = 0;
   }
 
 }

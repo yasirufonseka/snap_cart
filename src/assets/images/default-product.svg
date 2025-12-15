@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#f8f9fa" stroke="#e9ecef" stroke-width="2"/>
+  
+  <!-- Product Box Icon -->
+  <rect x="60" y="70" width="80" height="60" fill="#dee2e6" stroke="#adb5bd" stroke-width="2" rx="4"/>
+  
+  <!-- Product Details Lines -->
+  <rect x="70" y="85" width="60" height="4" fill="#6c757d" rx="2"/>
+  <rect x="70" y="95" width="40" height="4" fill="#6c757d" rx="2"/>
+  <rect x="70" y="105" width="50" height="4" fill="#6c757d" rx="2"/>
+  
+  <!-- Image Icon -->
+  <circle cx="80" cy="50" r="8" fill="#adb5bd"/>
+  <path d="M75 45 L85 55 L80 50 Z" fill="#6c757d"/>
+  
+  <!-- Text -->
+  <text x="100" y="160" text-anchor="middle" fill="#6c757d" font-family="Arial, sans-serif" font-size="12">No Image</text>
+  <text x="100" y="175" text-anchor="middle" fill="#adb5bd" font-family="Arial, sans-serif" font-size="10">Available</text>
+</svg>

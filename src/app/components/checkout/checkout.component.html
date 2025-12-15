@@ -197,9 +197,9 @@
         <!-- Items -->
         <div class="summary-items">
           <div class="summary-item" *ngFor="let item of cart.items">
-            <img [src]="item.productImage || 'assets/images/default-product.jpg'" 
+            <img [src]="item.productImage || 'assets/images/default-product.svg'" 
                  [alt]="item.productName"
-                 onerror="this.src='assets/images/default-product.jpg'">
+                 onerror="this.src='assets/images/default-product.svg'">
             <div class="item-details">
               <h4>{{ item.productName }}</h4>
               <p class="item-attributes">

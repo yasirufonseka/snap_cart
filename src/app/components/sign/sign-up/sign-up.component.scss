@@ -12,6 +12,81 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-  
+}
+
+/* Role Selection Styling */
+.role-selection {
+    .role-option-inline {
+        .form-check-input {
+            display: none; // Hide the default radio button
+        }
+        
+        .form-check-label {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            border: 2px solid #e9ecef !important;
+            border-radius: 8px !important;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            &:hover {
+                background-color: #e9ecef;
+                transform: translateY(-2px);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+        }
+        
+        .form-check-input:checked ~ .form-check-label {
+            background-color: #e3f2fd;
+            border-color: #007bff !important;
+            color: #007bff;
+            box-shadow: 0 2px 12px rgba(0,123,255,0.3);
+            transform: translateY(-2px);
+        }
+    }
     
+    .role-icon-small {
+        font-size: 1.2rem;
+        
+        .fa-user {
+            color: #28a745;
+        }
+        
+        .fa-store {
+            color: #ffc107;
+        }
+        
+        .fa-crown {
+            color: #dc3545;
+        }
+    }
+    
+    // Make icons more prominent when selected
+    .form-check-input:checked ~ .form-check-label .role-icon-small {
+        .fa-user {
+            color: #007bff;
+        }
+        
+        .fa-store {
+            color: #007bff;
+        }
+        
+        .fa-crown {
+            color: #007bff;
+        }
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .role-selection {
+        flex-direction: column !important;
+        
+        .role-option-inline {
+            margin-bottom: 0.5rem;
+        }
+    }
 }

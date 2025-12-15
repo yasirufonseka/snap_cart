@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { CookieHandlerService } from '../../services/cookie.handle';
 import { CurrencyPipe, CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 
 interface RecentProduct {
   id: string;
@@ -37,23 +39,31 @@ interface ProductDisplayItem {
 
 @Component({
   selector: 'app-dashboard-home',
-  imports: [CurrencyPipe, CommonModule],
+  imports: [CurrencyPipe, CommonModule,RouterLink],
   templateUrl: './dashboard-home.component.html',
   styleUrl: './dashboard-home.component.scss'
 })
-export class DashboardHomeComponent implements OnInit{
+export class DashboardHomeComponent implements OnInit, AfterViewInit {
+  @ViewChild('soldProductsChart', { static: false }) soldProductsChartRef!: ElementRef<HTMLCanvasElement>;
 
-  constructor(private http: HttpClient, private cookieService: CookieHandlerService) {}
+  constructor(private http: HttpClient, private cookieService: CookieHandlerService) {
+    Chart.register(...registerables);
+  }
+  
   recentProducts: ProductDisplayItem[] = [];
   private apiurl="http://localhost:8080/api/dashboard";
-
- stats = {
-    totalSales: 0,
-   
-   
-    totalProducts:0 ,
-    
+  private soldProductsChart: Chart | null = null;
+  dailySoldProductsData: any[] = [];
+  soldProductsStats = {
+    today: 0,
+    thisWeek: 0,
+    total: 0
   };
+
+  
+    totalSales:number = 0;
+    totalProducts:number = 0;
+  
 
 
   ngOnInit(): void {
@@ -62,6 +72,17 @@ export class DashboardHomeComponent implements OnInit{
     this.countOfProduct();
     this.getTotalSales();
     this.getRecentProducts();
+    this.getDailySoldProducts();
+  }
+
+  ngAfterViewInit(): void {
+    // Initialize chart after view is rendered
+    setTimeout(() => {
+      if (this.dailySoldProductsData.length > 0) {
+        this.createSoldProductsChart();
+      }
+      // Chart will be created when data is loaded from API
+    }, 500);
   }
 
   private debugBackendData() {
@@ -100,7 +121,7 @@ export class DashboardHomeComponent implements OnInit{
         this.recentProducts = response.map(product => ({
           id: product.id,
           name: product.items || product.collection || 'Unknown Product',
-          image: product.images && product.images.length > 0 ? product.images[0] : 'assets/images/default-product.jpg',
+          image: product.images && product.images.length > 0 ? product.images[0] : 'assets/images/default-product.svg',
           category: product.collection || 'General',
           price: product.price || 0,
           status: this.getProductStatus(product),
@@ -148,7 +169,7 @@ countOfProduct() {
       const statValueElement = document.querySelector('.stat-value');
       if (statValueElement) {
         statValueElement.textContent = response.toString();
-        this.stats.totalProducts = Number(response);
+        this.totalProducts = Number(response);
       }
     },
     error: (error) => {
@@ -164,53 +185,50 @@ getTotalSales(){
     return;
   }
 
-  console.log('=== FETCHING TOTAL SALES ===');
+  console.log('=== FETCHING TOTAL SALES FROM SOLD PRODUCTS ===');
   console.log('Seller ID from cookie:', sellerId);
   
-  // First, let's check what products exist for this seller
+  // Get products and calculate total sales from SOLD products only
   this.http.get<any[]>(`http://localhost:8080/api/dashboard/seller`, {
     params: { sellerId: sellerId }
   }).subscribe({
     next: (products) => {
-      console.log('Products found for seller:', products.length);
-      console.log('Product details:', products);
+      console.log('Total products found for seller:', products.length);
       
-      // Calculate expected total
-      let expectedTotal = 0;
+      // Filter only SOLD products and calculate total revenue
+      let soldProductsRevenue = 0;
+      let soldProductsCount = 0;
+      
       products.forEach((product, index) => {
-        console.log(`Product ${index + 1}: ${product.items || product.collection} - Price: $${product.price}`);
-        expectedTotal += product.price || 0;
+        const status = product.status ? product.status.toLowerCase() : '';
+        const price = product.price || 0;
+        
+        console.log(`Product ${index + 1}: ${product.items || product.collection} - Status: "${product.status}" - Price: $${price}`);
+        
+        // Only count products with status "sold"
+        if (status === 'sold') {
+          soldProductsRevenue += price;
+          soldProductsCount++;
+          console.log(`✅ SOLD Product: ${product.items || product.collection} - Added $${price} to revenue`);
+        }
       });
-      console.log('Expected total sales:', expectedTotal);
-    },
-    error: (error) => {
-      console.error('Error fetching products:', error);
-    }
-  });
-  
-  // Now get the calculated total from backend
-  this.http.get<string>('http://localhost:8080/api/dashboard/stats/totalsales', {
-    params: { sellerId: sellerId }
-  }).subscribe({
-    next: (response) => {
-      console.log('Backend calculated total sales:', response);
-      console.log('Response type:', typeof response);
       
-      // Convert string response to number
-      const salesValue = Number(response);
-      console.log('Final sales value displayed:', salesValue);
+      // Set the total sales from sold products only
+      this.totalSales = soldProductsRevenue;
       
-      this.stats.totalSales = salesValue;
+      console.log('🎯 SOLD PRODUCTS SUMMARY:');
+      console.log(`📦 Total products: ${products.length}`);
+      console.log(`💰 Sold products: ${soldProductsCount}`);
+      console.log(`💵 Total revenue from sold products: $${soldProductsRevenue}`);
+      console.log('✅ Total sales updated:', this.totalSales);
       
-      // Alert user if values don't match expectations
-      if (salesValue === 2 && this.expectedHigherValue()) {
-        console.warn('⚠️  Backend returned 2 but expected higher value. Check backend calculation logic.');
+      if (soldProductsCount === 0) {
+        console.warn('⚠️  No products with status="sold" found. Make sure to mark products as sold in product listings.');
       }
-      
     },
     error: (error) => {
-      console.error('Error fetching total sales:', error);
-      console.error('Error details:', error.error);
+      console.error('❌ Error fetching products:', error);
+      this.totalSales = 0;
     }
   });
 }
@@ -310,6 +328,222 @@ deleteProduct(product: any) {
       error: (error) => {
         console.error('Error deleting product:', error);
         alert('Error deleting product. Please try again.');
+      }
+    });
+  }
+}
+
+getDailySoldProducts() {
+  const sellerId = this.cookieService.getCookie('loginStatus');
+  if (!sellerId) {
+    console.error('Seller ID not found in cookies');
+    return;
+  }
+
+  console.log('=== FETCHING DAILY SOLD PRODUCTS ===');
+  console.log('Seller ID:', sellerId);
+
+  this.http.get<any[]>(`${this.apiurl}/stats/daily-sold-products`, {
+    params: { sellerId: sellerId, days: '7' }
+  }).subscribe({
+    next: (response) => {
+      console.log('Daily sold products data from backend:', response);
+      this.dailySoldProductsData = response;
+      this.calculateSoldProductsStats();
+      
+      // Create chart if view is already initialized
+      if (this.soldProductsChartRef) {
+        this.createSoldProductsChart();
+      }
+    },
+    error: (error) => {
+      console.error('Error fetching daily sold products:', error);
+      // Initialize empty data if API fails
+      this.dailySoldProductsData = [];
+      this.soldProductsStats = { today: 0, thisWeek: 0, total: 0 };
+    }
+  });
+}
+
+calculateSoldProductsStats() {
+  if (!this.dailySoldProductsData || this.dailySoldProductsData.length === 0) {
+    return;
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+  // Calculate today's sold products
+  const todayData = this.dailySoldProductsData.find(item => item.date === today);
+  this.soldProductsStats.today = todayData ? todayData.soldCount : 0;
+
+  // Calculate this week's sold products
+  this.soldProductsStats.thisWeek = this.dailySoldProductsData
+    .filter(item => new Date(item.date) >= oneWeekAgo)
+    .reduce((sum, item) => sum + (item.soldCount || 0), 0);
+
+  // Calculate total sold products
+  this.soldProductsStats.total = this.dailySoldProductsData
+    .reduce((sum, item) => sum + (item.soldCount || 0), 0);
+}
+
+private createDummySoldProductsData() {
+  const today = new Date();
+  this.dailySoldProductsData = [];
+  
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    
+    this.dailySoldProductsData.push({
+      date: date.toISOString().split('T')[0],
+      soldCount: Math.floor(Math.random() * 10) + 1 // Random sold products between 1-10
+    });
+  }
+  
+  console.log('Created dummy sold products data:', this.dailySoldProductsData);
+}
+
+createSoldProductsChart() {
+  if (!this.soldProductsChartRef) {
+    console.log('Chart ref not ready');
+    return;
+  }
+
+  // Handle empty data case - show empty chart with message
+  if (!this.dailySoldProductsData || this.dailySoldProductsData.length === 0) {
+    console.log('No sold products data available, showing empty chart');
+  }
+
+  const ctx = this.soldProductsChartRef.nativeElement.getContext('2d');
+  if (!ctx) {
+    console.error('Could not get chart context');
+    return;
+  }
+
+  // Destroy existing chart if it exists
+  if (this.soldProductsChart) {
+    this.soldProductsChart.destroy();
+  }
+
+  // Generate labels and data, handle empty data case
+  const labels = this.dailySoldProductsData && this.dailySoldProductsData.length > 0 
+    ? this.dailySoldProductsData.map(item => {
+        const date = new Date(item.date);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      })
+    : ['No Data'];
+
+  const data = this.dailySoldProductsData && this.dailySoldProductsData.length > 0 
+    ? this.dailySoldProductsData.map(item => item.soldCount)
+    : [0];
+
+  const config: ChartConfiguration = {
+    type: 'bar' as ChartType,
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Products Sold',
+        data: data,
+        backgroundColor: 'rgba(25, 118, 210, 0.7)',
+        borderColor: '#1976d2',
+        borderWidth: 1,
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top'
+        },
+        title: {
+          display: true,
+          text: 'Daily Sold Products Overview',
+          font: {
+            size: 16,
+            weight: 'bold'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)'
+          },
+          ticks: {
+            stepSize: 1,
+            callback: function(value) {
+              return Number(value) + ' products';
+            }
+          }
+        },
+        x: {
+          grid: {
+            color: 'rgba(0, 0, 0, 0.1)'
+          }
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      }
+    }
+  };
+
+  this.soldProductsChart = new Chart(ctx, config);
+  console.log('Sold products chart created successfully');
+}
+
+// Chart period selection methods
+selectChartPeriod(period: string, event?: Event) {
+  console.log('Selected chart period:', period);
+  
+  // Remove active class from all buttons
+  const buttons = document.querySelectorAll('.chart-actions .btn-outline');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  
+  // Add active class to clicked button
+  if (event?.target) {
+    (event.target as HTMLElement).classList.add('active');
+  }
+  
+  // Update chart data based on period
+  let days = 7;
+  switch (period) {
+    case 'weekly':
+      days = 7;
+      break;
+    case 'monthly':
+      days = 30;
+      break;
+    case 'yearly':
+      days = 365;
+      break;
+  }
+  
+  // Fetch new data
+  const sellerId = this.cookieService.getCookie('loginStatus');
+  if (sellerId) {
+    this.http.get<any[]>(`${this.apiurl}/stats/daily-sold-products`, {
+      params: { sellerId: sellerId, days: days.toString() }
+    }).subscribe({
+      next: (response) => {
+        this.dailySoldProductsData = response;
+        this.calculateSoldProductsStats();
+        this.createSoldProductsChart();
+      },
+      error: (error) => {
+        console.error('Error fetching daily sold products for period:', error);
+        // Initialize empty data if API fails
+        this.dailySoldProductsData = [];
+        this.soldProductsStats = { today: 0, thisWeek: 0, total: 0 };
+        this.createSoldProductsChart();
       }
     });
   }

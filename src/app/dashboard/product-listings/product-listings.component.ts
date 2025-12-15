@@ -21,13 +21,20 @@ import { RouterLink } from '@angular/router';
   city: string;
   price: number;
   discount: number;
-  status: 'available' | 'sold' | 'draft';
+  status: 'pending' | 'approved' | 'declined' | 'available' | 'sold' | 'draft';
   sellerId: string;
+  sellerName?: string;
+  declineReason?: string;
+  createdAt?: Date;
+  approvedAt?: Date;
 }
  interface Stats {
   totalProducts: number;
   soldProducts: number;
   draftProducts: number;
+  pendingProducts: number;
+  approvedProducts: number;
+  declinedProducts: number;
   totalRevenue: number;
 }
 
@@ -46,7 +53,12 @@ export class ProductListingsComponent implements OnInit {
   selectedCategory: string = '';
   selectedStatus: string = '';
   sortBy: string = 'newest';
-
+  activeApprovalTab: string = 'all'; // all, pending, approved, declined
+  approvalStats = {
+    pending: 0,
+    approved: 0,
+    declined: 0
+  };
 
   apiUrl: string = 'http://localhost:8080/api/dashboard/seller';
   isedit: boolean=false;
@@ -90,9 +102,9 @@ export class ProductListingsComponent implements OnInit {
     }
 
     console.log('✓ Valid seller ID found');
-    console.log('📡 Making API request to: http://localhost:8080/api/dashboard/seller' + sellerId);
+    console.log('📡 Making API request to: http://localhost:8080/api/seller/products/' + sellerId);
 
-    this.http.get<Product[]>(`${this.apiUrl}?sellerId=${sellerId}`)
+    this.http.get<Product[]>(`http://localhost:8080/api/seller/products/${sellerId}`)
       .subscribe({
         next: (products: Product[]) => {
           console.log('✓ API Response Status: 200 OK');
@@ -110,6 +122,7 @@ export class ProductListingsComponent implements OnInit {
           }
           
           this.products = products;
+          this.calculateApprovalStats();
           this.filterProducts();
           console.log('✓ Products loaded and filtered successfully',);
         },
@@ -173,15 +186,45 @@ export class ProductListingsComponent implements OnInit {
   }
 
   markAsSold(product: Product) {
-    this.http.put<Product>(`${this.apiUrl}/${product.id}`, { status: 'sold' })
+    // Create ProductDto with all required fields for the backend
+    const productDto = {
+      id: product.id,
+      images: product.images,
+      description: product.description,
+      collection: product.collection,
+      items: product.items,
+      brand: product.brand,
+      condition: product.condition,
+      serialNo: product.serialNo,
+      age: product.age,
+      colour: product.colour,
+      occasion: '', // Default value since this property doesn't exist in Product interface
+      size: product.size,
+      city: product.city,
+      price: product.price,
+      discount: product.discount,
+      sellerId: product.sellerId,
+      sellerName: product.sellerName || '',
+      status: 'sold' // This is what we're updating
+    };
+
+    this.http.put<any>('http://localhost:8080/api/dashboard/UpdateProduct', productDto)
       .subscribe({
-        next: (updatedProduct) => {
-          product.status = updatedProduct.status as 'available' | 'sold' | 'draft';
+        next: (response) => {
+          console.log('Product marked as sold successfully:', response);
+          product.status = 'sold' as 'available' | 'sold' | 'draft';
           window.alert('Product marked as sold successfully');
         },
         error: (error) => {
           console.error('Error marking product as sold:', error);
-          window.alert('Failed to mark product as sold');
+          console.error('Error details:', {
+            status: error.status,
+            statusText: error.statusText,
+            message: error.message,
+            url: error.url,
+            error: error.error
+          });
+          window.alert(`Failed to mark product as sold. Error: ${error.status} - ${error.statusText || error.message}`);
         }
       });
   }
@@ -203,19 +246,57 @@ export class ProductListingsComponent implements OnInit {
 
   deleteProduct(product: any) {
     if (confirm('Are you sure you want to delete this product?')) {
-      this.http.delete(`${this.apiUrl}/${product.id}`)
+      const productId = product.id  // Handle both id formats
+      console.log('Deleting product with ID:', productId);
+      
+      this.http.delete(`http://localhost:8080/api/dashboard/delete-product?productId=${productId}`)
         .subscribe({
-          next: () => {
-            this.products = this.products.filter(p => p.id !== product.id);
+          next: (response: any) => {
+            console.log('Delete response:', response);
+            
+            // Remove from both products array and allProducts array
+            this.products = this.products.filter(p => (p.id !== productId ));
+            
+            
+            // Re-categorize products after deletion
+            
             this.filterProducts();
-            window.alert('Product deleted successfully');
+            
+            window.alert(response.message || 'Product deleted successfully');
           },
           error: (error) => {
             console.error('Error deleting product:', error);
-            window.alert('Failed to delete product');
+            
+            // Check for specific error messages
+            if (error.status === 0) {
+              window.alert('Connection error. Please check if the server is running.');
+            } else if (error.status === 404) {
+              window.alert('Product not found. It may have already been deleted.');
+            } else if (error.error && error.error.message) {
+              window.alert('Failed to delete product: ' + error.error.message);
+            } else {
+              window.alert('Failed to delete product. Please try again.');
+            }
           }
         });
     }
+  }
+
+  // Helper methods for button visibility
+  canEditProduct(product: Product): boolean {
+   // console.log(`Can edit product with status: "${product.status}"`);
+    // Allow editing for all statuses except sold
+    return product.status !== 'sold';
+  }
+
+  canDeleteProduct(product: Product): boolean {
+    //console.log(`Can delete product with status: "${product.status}"`);
+    // Allow deletion for declined, pending, and draft products
+    return product.status === 'declined' || 
+           product.status === 'pending' || 
+           product.status === 'draft' ||
+           product.status === 'approved' || 
+           product.status === undefined;
   }
 
   getEmptyStateMessage(): string {
@@ -226,5 +307,50 @@ export class ProductListingsComponent implements OnInit {
       return "No products match your current filters.";
     }
     return "No products found.";
+  }
+
+  setActiveApprovalTab(tab: string) {
+    this.activeApprovalTab = tab;
+    this.filterProducts();
+  }
+
+  calculateApprovalStats() {
+    this.approvalStats = {
+      pending: this.products.filter(p => p.status === 'pending').length,
+      approved: this.products.filter(p => p.status === 'approved').length,
+      declined: this.products.filter(p => p.status === 'declined').length
+    };
+  }
+
+  get filteredProductsByApproval() {
+    let filtered = [...this.filteredProducts];
+    
+    if (this.activeApprovalTab !== 'all') {
+      filtered = filtered.filter(product => product.status === this.activeApprovalTab);
+    }
+    
+    return filtered;
+  }
+
+  getStatusBadgeClass(status: string): string {
+    switch (status) {
+      case 'pending': return 'badge-warning';
+      case 'approved': return 'badge-success';
+      case 'declined': return 'badge-danger';
+      case 'available': return 'badge-info';
+      case 'sold': return 'badge-secondary';
+      default: return 'badge-light';
+    }
+  }
+
+  getStatusText(status: string): string {
+    switch (status) {
+      case 'pending': return 'Pending Review';
+      case 'approved': return 'Approved';
+      case 'declined': return 'Declined';
+      case 'available': return 'Available';
+      case 'sold': return 'Sold';
+      default: return status;
+    }
   }
 }

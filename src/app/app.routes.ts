@@ -10,7 +10,6 @@ import { SellerComponent } from './components/seller/seller.component';
 import { ProductMenComponent } from './components/product/product-men/product-men.component';
 import { ProductWomenComponent } from './components/product/product-women/product-women.component';
 import { ProductSportsComponent } from './components/product/product-sports/product-sports.component';
-import { ProductKidsComponent } from './components/product/product-kids/product-kids.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProductListingsComponent } from './dashboard/product-listings/product-listings.component';
 import { DashboardHomeComponent } from './dashboard/dashboard-home/dashboard-home.component';
@@ -18,6 +17,11 @@ import { ProductEditComponent } from './shared/model/product-edit/product-edit.c
 import { ChatWidgetComponent } from './components/chat-widget/chat-widget.component';
 import { CartComponent } from './components/cart/cart.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
+import { AiChatbotComponent } from './components/ai-chatbot/ai-chatbot.component';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { ProductUploadComponent } from './components/product-upload/product-upload.component';
+import { ProductDetailComponent } from './components/product-detail/product-detail.component';
+
 
 export const routes: Routes = [
   
@@ -32,7 +36,6 @@ export const routes: Routes = [
      { path: "seller", component: SellerComponent },
       { path: "productMen", component: ProductMenComponent },
        { path: "productWomen", component: ProductWomenComponent },
-       { path: "productKids", component: ProductKidsComponent },
        { path: "productSports", component: ProductSportsComponent },
        { path: "productBrands", component: ProductComponent },
       { path: "product-edit/:id", component: ProductEditComponent },
@@ -40,6 +43,12 @@ export const routes: Routes = [
       {path:"chat", component:ChatWidgetComponent},
       {path:"cart", component:CartComponent},
       {path:"checkout", component:CheckoutComponent},
+      {path:"aibot", component:AiChatbotComponent},
+      {path:"admin-dashboard", component:AdminDashboardComponent},
+      {path:"product-upload", component:ProductUploadComponent},
+      {path:"aichatbot", component:AiChatbotComponent},
+      {path:"product-detail/:id", component:ProductDetailComponent},
+
      {
        path: "dashboard",
        component: DashboardComponent,

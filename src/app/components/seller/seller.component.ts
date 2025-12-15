@@ -29,7 +29,8 @@ export class SellerComponent implements OnInit {
       age: [''],
       city: [''],
       price: [''],
-      discount: ['']
+      discount: [''],
+      status: ['available'],
     });
   }
 
@@ -157,6 +158,8 @@ updateSubcategories(selectedValue: string | null) {
         error: (error) => { console.log("Failed to add product", error); }
 
       });
+
+      this.addProduct.reset();
     }
     }
   }

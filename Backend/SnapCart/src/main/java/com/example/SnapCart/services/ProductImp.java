@@ -16,6 +16,9 @@ public class ProductImp implements ProductService {
 
   @Autowired
   private ProductRepository productRepo;
+  
+  @Autowired
+  private com.example.SnapCart.repository.UserRepository userRepository;
 
   @Override
   public Product saveProduct(ProductDto reqProduct) {
@@ -35,7 +38,13 @@ public class ProductImp implements ProductService {
     product.setDescription(reqProduct.getDescription());
     product.setImages(reqProduct.getImages());
     product.setSellerId(reqProduct.getSellerId()); // Add sellerId mapping
-
+    
+    // Set seller name by looking up user
+    if (reqProduct.getSellerId() != null) {
+      userRepository.findById(reqProduct.getSellerId()).ifPresent(user -> {
+        product.setSellerName(user.getName() != null ? user.getName() : user.getUsername());
+      });
+    }
 
     return productRepo.save(product);
   }
@@ -65,6 +74,11 @@ public class ProductImp implements ProductService {
       throw new NullPointerException("No such items");
     }
 
+  }
+
+  @Override
+  public List<Product> getProBycity(String city) {
+    return List.of();
   }
 
 
@@ -101,6 +115,10 @@ public class ProductImp implements ProductService {
       product.setPrice(updateProduct.getPrice());
       product.setDiscount(updateProduct.getDiscount());
       product.setDescription(updateProduct.getDescription());
+      // Update status if provided
+      if (updateProduct.getStatus() != null) {
+        product.setStatus(updateProduct.getStatus());
+      }
       // Preserve sellerId - don't update it during product updates
       if (updateProduct.getSellerId() != null) {
         product.setSellerId(updateProduct.getSellerId());
@@ -121,7 +139,7 @@ public class ProductImp implements ProductService {
     System.out.println("ProductService: Searching for products with sellerId: '" + sellerId + "'");
     List<Product> products = productRepo.findBySellerId(sellerId);
     System.out.println("ProductService: Found " + products.size() + " products");
-    
+
     if (products.isEmpty()) {
       System.out.println("ProductService: No products found for sellerId: " + sellerId);
       // Let's also check if there are any products at all
@@ -129,7 +147,7 @@ public class ProductImp implements ProductService {
       System.out.println("ProductService: Total products in database: " + totalProducts);
       return 0.0;
     }
-    
+
     System.out.println("ProductService: Product details:");
     double runningTotal = 0.0;
     for (Product p : products) {
@@ -137,26 +155,26 @@ public class ProductImp implements ProductService {
       runningTotal += price;
       System.out.println("  ID: " + p.getId() + ", Price: " + price + ", Running Total: " + runningTotal + ", SellerId: '" + p.getSellerId() + "'");
     }
-    
+
     double totalSales = products.stream()
         .mapToDouble(Product::getPrice)
         .sum();
     System.out.println("ProductService: Stream calculated total: " + totalSales);
     System.out.println("ProductService: Manual calculated total: " + runningTotal);
-    
+
     // Let's also check if there are any sold quantities or other factors
     System.out.println("ProductService: Raw product data check:");
     for (Product p : products) {
       System.out.println("  Product: " + p.getItems() + " | Brand: " + p.getBrand() + " | Price: " + p.getPrice() + " | Status: " + p.getStatus());
     }
-    
+
     return totalSales;
   }
 
   @Override
   public List<Product> getRecentProductsBySeller(String sellerId, int limit) {
     System.out.println("Getting recent products for seller: " + sellerId + ", limit: " + limit);
-    
+
     if (limit <= 5) {
       // Use the optimized repository method for small limits
       List<Product> recentProducts = productRepo.findTop5BySellerIdOrderByIdDesc(sellerId);
@@ -173,5 +191,137 @@ public class ProductImp implements ProductService {
       return recentProducts;
     }
   }
+
+  // Admin methods implementation
+  @Override
+  public List<Product> getProductsByStatus(String status) {
+    return productRepo.findByStatus(status);
+  }
+
+  @Override
+  public Product approveProduct(String productId) {
+    Optional<Product> productOpt = productRepo.findById(productId);
+    if (productOpt.isPresent()) {
+      Product product = productOpt.get();
+      product.setStatus("approved");
+      product.setApprovedAt(java.time.LocalDateTime.now());
+      return productRepo.save(product);
+    } else {
+      throw new RuntimeException("Product not found with ID: " + productId);
+    }
+  }
+
+  @Override
+  public Product declineProduct(String productId, String reason) {
+    Optional<Product> productOpt = productRepo.findById(productId);
+    if (productOpt.isPresent()) {
+      Product product = productOpt.get();
+      product.setStatus("declined");
+      product.setDeclineReason(reason);
+      return productRepo.save(product);
+    } else {
+      throw new RuntimeException("Product not found with ID: " + productId);
+    }
+  }
+
+  @Override
+  public List<Product> getProductsBySellerId(String sellerId) {
+    return productRepo.findBySellerId(sellerId);
+  }
+
+  @Override
+  public List<Product> getProductsBySellerIdAndStatus(String sellerId, String status) {
+    return productRepo.findBySellerIdAndStatus(sellerId, status);
+  }
+
+  @Override
+  public long getTotalProductsCount() {
+    return productRepo.count();
+  }
+  
+  @Override
+  public java.util.List<java.util.Map<String, Object>> getDailyProductStats(int days) {
+    java.util.List<java.util.Map<String, Object>> dailyStats = new java.util.ArrayList<>();
+    java.time.LocalDate today = java.time.LocalDate.now();
+    
+    // Get all products from database
+    List<Product> allProducts = productRepo.findAll();
+    
+    // Group products by creation date
+    for (int i = days - 1; i >= 0; i--) {
+      java.time.LocalDate targetDate = today.minusDays(i);
+      java.time.LocalDateTime startOfDay = targetDate.atStartOfDay();
+      java.time.LocalDateTime endOfDay = targetDate.atTime(23, 59, 59);
+      
+      // Count products created on this specific date
+      long count = allProducts.stream()
+        .filter(product -> product.getCreatedAt() != null)
+        .filter(product -> {
+          java.time.LocalDateTime createdAt = product.getCreatedAt();
+          return !createdAt.isBefore(startOfDay) && !createdAt.isAfter(endOfDay);
+        })
+        .count();
+      
+      java.util.Map<String, Object> dayStat = new java.util.HashMap<>();
+      dayStat.put("date", targetDate.toString());
+      dayStat.put("count", count);
+      dailyStats.add(dayStat);
+    }
+    
+    return dailyStats;
+  }
+  
+  @Override
+  public java.util.List<java.util.Map<String, Object>> getDailyUserRegistrationStats(int days) {
+    // This method would need UserService injection, for now return empty list
+    // Will be implemented when UserService gets similar functionality
+    java.util.List<java.util.Map<String, Object>> userStats = new java.util.ArrayList<>();
+    java.time.LocalDate today = java.time.LocalDate.now();
+    
+    for (int i = days - 1; i >= 0; i--) {
+      java.time.LocalDate targetDate = today.minusDays(i);
+      java.util.Map<String, Object> dayStat = new java.util.HashMap<>();
+      dayStat.put("date", targetDate.toString());
+      dayStat.put("count", 0); // Placeholder - implement with UserService
+      userStats.add(dayStat);
+    }
+    
+    return userStats;
+  }
+
+  @Override
+  public List<Product> searchProducts(String query) {
+    if (query == null || query.trim().isEmpty()) {
+      return productRepo.findAll();
+    }
+    
+    String searchTerm = query.trim().toLowerCase();
+    System.out.println("ProductService: Searching for products with query: '" + searchTerm + "'");
+    
+    // Search by brand, items (category), description, and collection
+    List<Product> results = productRepo.findByBrandContainingIgnoreCaseOrItemsContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrCollectionContainingIgnoreCase(
+        searchTerm, searchTerm, searchTerm, searchTerm);
+    
+    // Filter only approved products for public search
+    results = results.stream()
+        .filter(product -> "approved".equals(product.getStatus()))
+        .collect(java.util.stream.Collectors.toList());
+    
+    System.out.println("ProductService: Found " + results.size() + " products matching query");
+    return results;
+  }
+
+    @Override
+    public Product deleteProduct(String id) {
+      Optional<Product> productOpt = productRepo.findById(id);
+      if (productOpt.isPresent()) {
+        Product product = productOpt.get();
+        productRepo.delete(product);
+        return product;
+      } else {
+        throw new RuntimeException("Product not found with ID: " + id); 
+      }
+  }  
+    
 
 }

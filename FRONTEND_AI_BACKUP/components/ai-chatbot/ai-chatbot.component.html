@@ -1,0 +1,117 @@
+<div class="chatbot-container">
+  <!-- Chat Toggle Button -->
+  <button class="chat-toggle" (click)="toggleChat()" [class.active]="isChatOpen">
+    <span class="icon">🤖</span>
+    <span class="text">AI Fashion Assistant</span>
+  </button>
+
+  <!-- Chat Window -->
+  <div class="chat-window" [class.open]="isChatOpen">
+    <div class="chat-header">
+      <div class="header-content">
+        <span class="header-icon">🤖</span>
+        <div>
+          <h3>GeminiStore AI</h3>
+          <p class="subtitle">Powered by Gemini Pro Vision</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="toggleChat()">×</button>
+    </div>
+
+    <div class="chat-messages" #messagesContainer>
+      <div *ngFor="let message of messages" class="message" [class.user-message]="message.isUser"
+        [class.ai-message]="!message.isUser">
+        <div class="message-content">
+          <!-- User uploaded image -->
+          <div *ngIf="message.imageUrl" class="message-image">
+            <img [src]="message.imageUrl" alt="Uploaded image">
+          </div>
+
+          <!-- Message text -->
+          <p class="message-text">{{ message.text }}</p>
+
+          <!-- Product recommendations -->
+          <div *ngIf="message.products && message.products.length > 0" class="message-products">
+            <div class="products-header">
+              <span class="products-count">{{ message.products.length }} matches found</span>
+            </div>
+            <div class="products-grid">
+              <div *ngFor="let product of message.products" class="product-card-mini">
+                <div class="product-image-mini">
+                  <img
+                    [src]="(product.images && product.images.length > 0) ? product.images[0] : 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%23f0f0f0%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%23999%22%3EProduct%3C/text%3E%3C/svg%3E'"
+                    [alt]="product.name || 'Product'"
+                    onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22400%22%3E%3Crect width=%22400%22 height=%22400%22 fill=%22%23f0f0f0%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%23999%22%3EProduct%3C/text%3E%3C/svg%3E'">
+                  <div *ngIf="product.discount && product.discount > 0" class="discount-badge">
+                    -{{ product.discount }}%
+                  </div>
+                </div>
+                <div class="product-info-mini">
+                  <h5>{{ product.name }}</h5>
+                  <p class="product-details">
+                    <span class="color-dot" [style.background-color]="product.colour"></span>
+                    {{ product.colour }} • {{ product.occasion }}
+                  </p>
+                  <div class="product-price">
+                    <span class="current-price">
+                      LKR {{ getDiscountedPrice(product.price, product.discount) | number:'1.2-2' }}
+                    </span>
+                    <span *ngIf="product.discount > 0" class="original-price">
+                      LKR {{ product.price | number:'1.2-2' }}
+                    </span>
+                  </div>
+                  <button class="view-btn" (click)="viewProduct(product.id)">
+                    View Product →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <span class="timestamp">{{ message.timestamp | date:'short' }}</span>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="message ai-message">
+        <div class="message-content loading">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <p class="loading-text">Analyzing your request...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+      <!-- Image Preview -->
+      <div class="image-preview" *ngIf="imagePreview">
+        <img [src]="imagePreview" alt="Preview">
+        <button class="remove-image-btn" (click)="removeImage()">×</button>
+      </div>
+
+      <div class="chat-input">
+        <input type="file" #fileInput accept="image/*" (change)="onFileSelected($event)" style="display: none">
+
+        <button class="attach-btn" (click)="triggerFileInput()" [disabled]="isLoading" title="Upload image">
+          📷
+        </button>
+
+        <input type="text" [(ngModel)]="userInput" (keypress)="onKeyPress($event)"
+          placeholder="Ask about products or upload an image..." [disabled]="isLoading" class="text-input">
+
+        <button class="send-btn" (click)="sendMessage()"
+          [disabled]="(!userInput.trim() && !selectedImage) || isLoading">
+          <span *ngIf="!isLoading">Send</span>
+          <span *ngIf="isLoading">...</span>
+        </button>
+      </div>
+
+      <p class="input-hint">
+        💡 Try: "I need a suit for wedding" or upload a photo
+      </p>
+    </div>
+  </div>
+</div>

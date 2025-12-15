@@ -50,11 +50,21 @@ export class SignInComponent implements OnInit {
 
 ngOnInit(): void {
     // Check if user is already logged in
-    const loginStatus = this.getCookie('loginStatus');
-    if (loginStatus) {
-      this.loginResponce = loginStatus;
-      // Optionally, redirect to home page if already logged in
-      window.location.href = '/home';
+    if (this.cookieHandler.isLoggedIn()) {
+      const userId = this.cookieHandler.getUserId();
+      const userRole = this.cookieHandler.getUserRole();
+      
+      console.log('User already logged in - ID:', userId, 'Role:', userRole);
+      this.loginResponce = userId;
+      
+      // Redirect based on user role
+      // if (userRole === 'admin') {
+      //   window.location.href = '/admin-dashboard';
+      // } else if (userRole === 'seller') {
+      //   window.location.href = '/dashboard';
+      // } else {
+      //   window.location.href = '/home';
+      // }
     }
 }
 
@@ -68,24 +78,55 @@ ngOnInit(): void {
       console.log('Password:', login.password);
       console.log('Password length:', login.password ? login.password.length : 'null');
 
-      this.http.post('http://localhost:8080/api/login', login, { responseType: "text" }).subscribe({
+      this.http.post<any>('http://localhost:8080/api/login', login).subscribe({
         next: (response) => {
           console.log('✅ Login successful! Response:', response);
-          window.alert('Login successful!');
-          this.loginResponce = response
-
-          //set cookie with loginresponce value
-          this.cookieHandler.setCookie('loginStatus', this.loginResponce ? this.loginResponce.toString() : '', 1);
-          console.log('Cookie set:', document.cookie);
-          //redirect to home page
-          window.location.href = '/home';
+          
+          // Handle new response structure
+          if (response && typeof response === 'object') {
+            // New structured response
+            const userId = response.userId;
+            const userRole = response.role || 'seller';
+            const userEmail = response.email;
+            const userName = response.name;
+            
+            console.log('User ID:', userId);
+            console.log('User Role:', userRole);
+            console.log('User Email:', userEmail);
+            console.log('User Name:', userName);
+            
+            // Set cookies with user ID, role, email, and name
+            this.cookieHandler.setLoginCookies(userId, userRole, userEmail, userName, 7);
+            
+            window.alert(`Login successful! Welcome ${userName || response.username}`);
+            this.loginResponce = userId;
+            
+            // Redirect based on user role
+            if (userRole === 'admin') {
+              window.location.href = '/';
+            } else if (userRole === 'seller') {
+              window.location.href = '/';
+            } else {
+              window.location.href = '/';
+            }
+          } else {
+            // Fallback for old response format (just user ID as string)
+            const userId = typeof response === 'string' ? response : response.toString();
+            this.cookieHandler.setLoginCookies(userId, 'customer', undefined, undefined, 7); // Default role
+            
+            window.alert('Login successful!');
+            this.loginResponce = userId;
+            window.location.href = '/home';
+          }
+          
+          console.log('Cookies set:', document.cookie);
         },
         error: (error) => { 
           console.log('❌ Login failed!');
           console.log('Error details:', error);
           console.log('Status:', error.status);
           console.log('Error message:', error.error);
-          window.alert('Login failed: ' + error.error);
+          window.alert('Login failed: ' + (error.error || 'Unknown error'));
         }
       });
       

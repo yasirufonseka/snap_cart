@@ -13,10 +13,25 @@ import { Router } from '@angular/router';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent  {
+  activeTab: string = 'overview';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) {
+    // Set initial active tab based on current route
+    this.setInitialActiveTab();
+  }
 
-  
- 
-  
+  setActiveTab(tab: string) {
+    this.activeTab = tab;
+  }
+
+  private setInitialActiveTab() {
+    const currentUrl = this.router.url;
+    if (currentUrl.includes('product-listings')) {
+      this.activeTab = 'products';
+    } else if (currentUrl.includes('dashboard-home')) {
+      this.activeTab = 'overview';
+    } else {
+      this.activeTab = 'overview'; // default
+    }
+  }
 }

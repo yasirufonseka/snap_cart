@@ -1,63 +1,302 @@
-<section>
+<div class="product-page-container">
+  <!-- Header Section -->
+  <div class="page-header">
     <div class="container">
-        <h1 class="fs-2">{{Category_Name}}</h1>
-        <p>{{search_result}}</p>
-    </div>
-
-    <div class="container d-flex flex-row align-items-center gap-3">
-        <p class="fs-3">Popular brands :</p>
-        <p class="fs-5">{{Popular_brands}}</p>
-        
-    </div>
-    <div class="container">
-        
-    </div>
-</section>
-<section>
-    <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content p-3">
-      <div class="modal-body d-flex flex-column flex-md-row">
-        
-        <!-- Product Image -->
-        <div class="col-md-6 text-center ">
-          <img src="/images/Zara-t-shrit.jpg" alt="Zara T-shirt" class="img-fluid h-100 w-100 img-contain rounded mb-3">
-          <div>
-            <i class="bi bi-heart"></i>
-          </div>
+      <div class="header-content">
+        <div class="breadcrumb">
+          <a routerLink="/home" class="breadcrumb-link">
+            <i class="fas fa-home"></i>
+            Home
+          </a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">{{ Category_Name }}</span>
         </div>
-
-        <!-- Product Details -->
-        <div class="col-md-6 ps-3">
-          <h5 class="fw-bold">Zara Black T-shirt</h5>
-          <p><span class="fw-bold">Rs. 4000</span> <span class="badge bg-danger ms-2">40% Off</span></p>
-          <p><strong>Size:</strong> L, XL</p>
-          <p><strong>Serial No:</strong> 1458905347</p>
-          <p><strong>Color:</strong> Black</p>
-          <p><strong>Condition:</strong> Excellent</p>
-
-          <div class="d-grid gap-2 my-3">
-            <button class="btn btn-warning">Buy Now</button>
-            <button class="btn btn-outline-dark">Add to Cart</button>
-          </div>
-
-          <small class="text-muted">All purchases through Snap Cart covered by Buyer Protection.</small>
+        
+        <h1 class="page-title">{{ Category_Name }}</h1>
+        
+        <div class="results-info" *ngIf="viewMode === 'search'">
+          <span class="results-count">{{ search_result }} {{ search_result === '1' ? 'product' : 'products' }} found</span>
+          <span class="search-query" *ngIf="searchQuery">for "{{ searchQuery }}"</span>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Recent Reviews -->
-      <div class="mt-4">
-        <h6>Recent Reviews</h6>
-        <div class="card mb-2 p-2">
-          <div class="d-flex align-items-center">
-            <img src="assets/user1.svg" alt="user" class="rounded-circle me-2" width="40" height="40">
-            <p class="mb-0"><strong>Lucas Johnson:</strong> The seller was so patient and communication was perfect. Seller was great!</p>
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+    </div>
+    <p>Loading products...</p>
+  </div>
+
+  <!-- Single Product View -->
+  <div class="single-product-container" *ngIf="viewMode === 'single' && !loading && singleProduct">
+    <div class="container">
+      <div class="product-detail-card">
+        <div class="product-images">
+          <div class="main-image">
+            <img [src]="getProductImage(singleProduct)" 
+                 [alt]="singleProduct.description"
+                 (error)="onImageError($event)"
+                 class="product-main-img">
+          </div>
+          <div class="thumbnail-images" *ngIf="singleProduct.images && singleProduct.images.length > 1">
+            <img *ngFor="let image of singleProduct.images.slice(0, 4)"
+                 [src]="image"
+                 [alt]="singleProduct.description"
+                 (error)="onImageError($event)"
+                 class="thumbnail-img">
           </div>
         </div>
-        <div class="card p-2">
-          <div class="d-flex align-items-center">
-            <img src="assets/user2.svg" alt="user" class="rounded-circle me-2" width="40" height="40">
-            <p class="mb-0"><strong>Tyler Smith:</strong> Seller is very friendly, excellent product!</p>
+        
+        <div class="product-info">
+          <div class="product-header">
+            <h2 class="product-title">{{ singleProduct.description }}</h2>
+            <div class="product-badges">
+              <span class="badge badge-brand">{{ singleProduct.brand }}</span>
+              <span class="badge badge-category">{{ singleProduct.items }}</span>
+              <span class="badge badge-condition">{{ singleProduct.condition }}</span>
+            </div>
+          </div>
+          
+          <div class="product-price">
+            <span class="current-price">Rs. {{ singleProduct.price }}</span>
+            <span class="discount" *ngIf="singleProduct.discount > 0">{{ singleProduct.discount }}% OFF</span>
+          </div>
+          
+          <div class="product-details">
+            <div class="detail-row" *ngIf="singleProduct.colour">
+              <span class="detail-label">Color:</span>
+              <span class="detail-value">{{ singleProduct.colour }}</span>
+            </div>
+            <div class="detail-row" *ngIf="singleProduct.size">
+              <span class="detail-label">Size:</span>
+              <span class="detail-value">{{ singleProduct.size }}</span>
+            </div>
+            <div class="detail-row" *ngIf="singleProduct.gender">
+              <span class="detail-label">Gender:</span>
+              <span class="detail-value">{{ singleProduct.gender }}</span>
+            </div>
+            <div class="detail-row" *ngIf="singleProduct.occasion">
+              <span class="detail-label">Occasion:</span>
+              <span class="detail-value">{{ singleProduct.occasion }}</span>
+            </div>
+            <div class="detail-row" *ngIf="singleProduct.city">
+              <span class="detail-label">Location:</span>
+              <span class="detail-value">{{ singleProduct.city }}</span>
+            </div>
+          </div>
+          
+          <div class="product-actions">
+            <button class="btn btn-primary btn-lg" (click)="addToCart(singleProduct)">
+              <i class="fas fa-shopping-cart"></i>
+              Add to Cart
+            </button>
+          
+
+            <button class="btn btn-outline btn-lg" (click)="viewSellerDetails(singleProduct)">
+              <i class="fas fa-user "></i>
+              Contact Seller
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid View -->
+  <div class="products-grid-container" *ngIf="viewMode === 'search' && !loading">
+    <div class="container">
+      <!-- Popular Brands Filter -->
+      <div class="filters-section" *ngIf="Popular_brands.length > 0">
+        <div class="filter-header">
+          <h3>Popular Brands</h3>
+          <button class="clear-filters-btn" (click)="clearFilters()" *ngIf="searchQuery">
+            <i class="fas fa-times"></i>
+            Clear Filters
+          </button>
+        </div>
+        <div class="brand-filters">
+          <button class="brand-filter" 
+                  *ngFor="let brand of Popular_brands"
+                  [class.active]="searchQuery === brand"
+                  (click)="filterByBrand(brand)">
+            {{ brand }}
+          </button>
+        </div>
+      </div>
+      
+      <!-- Products Grid -->
+      <div class="products-grid" *ngIf="filteredProducts.length > 0">
+        <div class="product-card" *ngFor="let product of filteredProducts">
+          <div class="product-image-container">
+            <img [src]="getProductImage(product)" 
+                 [alt]="product.description"
+                 (error)="onImageError($event)"
+                 class="product-image"
+                 (click)="openProductModal(product)">
+            <div class="product-overlay">
+              <button class="overlay-btn" (click)="addToCart(product)" title="Add to Cart">
+                <i class="fas fa-shopping-cart"></i>
+              </button>
+              <button class="overlay-btn" (click)="viewSellerDetails(product)" title="View Seller">
+                <i class="fas fa-user"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="product-content" (click)="openProductModal(product)">
+            <h4 class="product-name" 
+                >{{ product.description }}</h4>
+            <div class="product-meta">
+              <span class="product-brand">{{ product.brand }}</span>
+              <span class="product-category">{{ product.items }}</span>
+            </div>
+            <div class="product-price-section">
+              <span class="product-price">Rs. {{ product.price }}</span>
+              <span class="product-discount" *ngIf="product.discount > 0">{{ product.discount }}% OFF</span>
+            </div>
+            <div class="product-location" *ngIf="product.city">
+              <i class="fas fa-map-marker-alt"></i>
+              {{ product.city }}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- No Products Found -->
+      <div class="no-products" *ngIf="filteredProducts.length === 0 && !loading">
+        <div class="no-products-content">
+          <i class="fas fa-search fa-4x"></i>
+          <h3>No Products Found</h3>
+          <p *ngIf="searchQuery">No products found for "{{ searchQuery }}". Try different keywords.</p>
+          <p *ngIf="!searchQuery">No products available at the moment.</p>
+          <button class="btn btn-primary" routerLink="/home">
+            <i class="fas fa-home"></i>
+            Back to Home
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ 
+
+  <!-- Product Detail Modal -->
+  <div class="modal-overlay" *ngIf="showProductModal" (click)="closeProductModal()">
+    <div class="modal-content product-detail-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>
+          <i class="fas fa-box-open"></i>
+          {{ selectedProduct?.brand }} - {{ selectedProduct?.items }}
+        </h3>
+        <button class="close-btn" (click)="closeProductModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body product-modal-body" *ngIf="selectedProduct">
+        <!-- Product Images Section -->
+        <div class="product-images-section">
+          <div class="main-product-image">
+            <img [src]="getProductImage(selectedProduct)" 
+                 [alt]="selectedProduct.description"
+                 (error)="onImageError($event)"
+                 class="main-modal-image">
+          </div>
+          
+          <!-- Thumbnail Images -->
+          <div class="thumbnail-gallery" *ngIf="selectedProduct.images && selectedProduct.images.length > 1">
+            <img *ngFor="let image of selectedProduct.images.slice(0, 4)"
+                 [src]="image"
+                 [alt]="selectedProduct.description"
+                 (error)="onImageError($event)"
+                 class="thumbnail-modal-image">
+          </div>
+        </div>
+        
+        <!-- Product Details Section -->
+        <div class="product-details-section">
+          <div class="product-header-info">
+            <h4 class="product-modal-title">{{ selectedProduct.brand }} {{ selectedProduct.items }}</h4>
+            <div class="product-badges-modal">
+              <span class="badge badge-brand">{{ selectedProduct.brand }}</span>
+              <span class="badge badge-category">{{ selectedProduct.items }}</span>
+              <span class="badge badge-condition">{{ selectedProduct.condition }}</span>
+            </div>
+          </div>
+          
+          <div class="price-section">
+            <span class="product-price-modal">Rs. {{ selectedProduct.price }}</span>
+            <span class="discount-badge" *ngIf="selectedProduct.discount > 0">{{ selectedProduct.discount }}% OFF</span>
+          </div>
+          
+          <div class="product-specifications">
+            <div class="spec-row" *ngIf="selectedProduct.size">
+              <span class="spec-label"><i class="fas fa-ruler"></i> Size:</span>
+              <span class="spec-value">{{ selectedProduct.size }}</span>
+            </div>
+            
+            <div class="spec-row" *ngIf="selectedProduct.serialNo">
+              <span class="spec-label"><i class="fas fa-barcode"></i> Serial No:</span>
+              <span class="spec-value">{{ selectedProduct.serialNo }}</span>
+            </div>
+            
+            <div class="spec-row" *ngIf="selectedProduct.colour">
+              <span class="spec-label"><i class="fas fa-palette"></i> Color:</span>
+              <div class="color-info">
+                <span class="color-box" [style.background-color]="selectedProduct.colour"></span>
+                <span class="spec-value">{{ selectedProduct.colour }}</span>
+              </div>
+            </div>
+            
+            <div class="spec-row" *ngIf="selectedProduct.condition">
+              <span class="spec-label"><i class="fas fa-star"></i> Condition:</span>
+              <span class="spec-value">{{ selectedProduct.condition }}</span>
+            </div>
+            
+            <div class="spec-row" *ngIf="selectedProduct.description">
+              <span class="spec-label"><i class="fas fa-info-circle"></i> Description:</span>
+              <span class="spec-value">{{ selectedProduct.description }}</span>
+            </div>
+            
+            <div class="spec-row" *ngIf="selectedProduct.city">
+              <span class="spec-label"><i class="fas fa-map-marker-alt"></i> Location:</span>
+              <span class="spec-value">{{ selectedProduct.city }}</span>
+            </div>
+            
+            <div class="spec-row" *ngIf="selectedProduct.gender">
+              <span class="spec-label"><i class="fas fa-user"></i> Gender:</span>
+              <span class="spec-value">{{ selectedProduct.gender }}</span>
+            </div>
+            
+            <div class="spec-row" *ngIf="selectedProduct.occasion">
+              <span class="spec-label"><i class="fas fa-calendar"></i> Occasion:</span>
+              <span class="spec-value">{{ selectedProduct.occasion }}</span>
+            </div>
+          </div>
+          
+          <!-- Trust Badge -->
+          <div class="trust-badge">
+            <i class="fas fa-shield-check"></i>
+            <span>All purchases through SnapCart covered by Buyer Protection</span>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="modal-actions">
+            <!-- <button class="btn btn-primary btn-modal" (click)="openSellerModalFromProduct()">
+              <i class="fas fa-shopping-bag"></i>
+              Buy Now
+            </button> -->
+            <button class="btn btn-outline btn-modal" (click)="addToCart(selectedProduct)">
+              <i class="fas fa-shopping-cart"></i>
+              Add to Cart
+            </button>
+            <button class="btn btn-info btn-modal" (click)="viewSellerDetails(selectedProduct)">
+              <i class="fas fa-user"></i>
+              Contact Seller
+            </button>
           </div>
         </div>
       </div>
@@ -65,4 +304,95 @@
   </div>
 </div>
 
-    
+ <!-- Seller Details Modal -->
+  <div class="modal-overlay" *ngIf="showSellerModal" (click)="closeSellerModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>
+          <i class="fas fa-user-circle"></i>
+          Seller Information
+        </h3>
+        <button class="close-btn" (click)="closeSellerModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Loading State -->
+        <div class="loading-state" *ngIf="loadingSeller">
+          <div class="spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+          <p>Loading seller information...</p>
+        </div>
+        
+        <!-- Error State -->
+        <div class="error-state" *ngIf="sellerError && !loadingSeller">
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>{{ sellerError }}</p>
+          </div>
+        </div>
+        
+        <!-- Seller Details -->
+        <div class="seller-details" *ngIf="selectedSeller && !loadingSeller">
+          <div class="seller-info-grid">
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-user"></i>
+                <span>Seller Name</span>
+              </div>
+              <div class="info-value">{{ selectedSeller.name }}</div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-envelope"></i>
+                <span>Email</span>
+              </div>
+              <div class="info-value">
+                <a [href]="'mailto:' + selectedSeller.email" class="email-link">
+                  {{ selectedSeller.email }}
+                </a>
+              </div>
+            </div>
+            
+            <div class="info-item" *ngIf="selectedSeller.contact || selectedSeller.phoneNumber">
+              <div class="info-label">
+                <i class="fas fa-phone"></i>
+                <span>Contact Number</span>
+              </div>
+              <div class="info-value">
+                <a [href]="'tel:' + (selectedSeller.contact || selectedSeller.phoneNumber)" class="phone-link">
+                  {{ selectedSeller.contact || selectedSeller.phoneNumber }}
+                </a>
+              </div>
+            </div>
+            
+            <div class="info-item" *ngIf="selectedSeller.location">
+              <div class="info-label">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Location</span>
+              </div>
+              <div class="info-value">{{ selectedSeller.location }}</div>
+            </div>
+            
+            <div class="info-item" *ngIf="selectedSeller.address">
+              <div class="info-label">
+                <i class="fas fa-home"></i>
+                <span>Address</span>
+              </div>
+              <div class="info-value">{{ selectedSeller.address }}</div>
+            </div>
+          </div>
+          
+          <div class="contact-actions">
+            <button class="btn btn-outline" (click)="closeSellerModal()">
+              <i class="fas fa-times"></i>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

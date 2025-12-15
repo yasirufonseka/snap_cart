@@ -57,9 +57,9 @@
         
         <!-- Product Image -->
         <div class="item-image">
-          <img [src]="item.productImage || 'assets/images/default-product.jpg'" 
+          <img [src]="item.productImage || 'assets/images/default-product.svg'" 
                [alt]="item.productName"
-               onerror="this.src='assets/images/default-product.jpg'">
+               onerror="this.src='assets/images/default-product.svg'">
         </div>
 
         <!-- Product Details -->
@@ -74,7 +74,7 @@
               <i class="fas fa-palette"></i> Color: {{ item.color }}
             </span>
           </div>
-          <p class="item-price">{{ item.price | currency:'USD':'symbol':'1.2-2' }} each</p>
+          <p class="item-price">{{ item.price | currency:'LKR.':'symbol':'1.2-2' }} each</p>
         </div>
 
         <!-- Quantity Controls -->
@@ -90,14 +90,18 @@
 
         <!-- Item Total -->
         <div class="item-total">
-          <p class="subtotal">{{ getItemSubtotal(item) | currency:'USD':'symbol':'1.2-2' }}</p>
+          <p class="subtotal">{{ getItemSubtotal(item) | currency:'LKR.':'symbol':'1.2-2' }}</p>
         </div>
 
-        <!-- Remove Button -->
+        <!-- Action Buttons -->
         <div class="item-actions">
-          <button class="remove-btn" (click)="removeItem(item)" title="Remove item">
-            <i class="fas fa-trash"></i>
+          <button class="seller-btn" (click)="viewSellerDetails(item)" title="View seller details">
+            <i class="fas fa-user"></i>
+           Buy Now
           </button>
+            <button class="remove-btn" (click)="removeItem(item)" title="Remove item">
+            Remove
+            </button>
         </div>
 
       </div>
@@ -110,7 +114,7 @@
         
         <div class="summary-line">
           <span>Items ({{ cart.totalItems }})</span>
-          <span>{{ cart.totalAmount | currency:'USD':'symbol':'1.2-2' }}</span>
+          <span>{{ cart.totalAmount | currency:'LKR.':'symbol':'1.2-2' }}</span>
         </div>
         
         <div class="summary-line">
@@ -120,7 +124,7 @@
         
         <div class="summary-line total-line">
           <span><strong>Total</strong></span>
-          <span><strong>{{ cart.totalAmount | currency:'USD':'symbol':'1.2-2' }}</strong></span>
+          <span><strong>{{ cart.totalAmount | currency:'LKR.':'symbol':'1.2-2' }}</strong></span>
         </div>
 
         <div class="summary-actions">
@@ -128,13 +132,106 @@
             <i class="fas fa-trash"></i>
             Clear Cart
           </button>
-          <button class="btn-primary checkout-btn" (click)="proceedToCheckout()">
+          <!-- <button class="btn-primary checkout-btn" (click)="proceedToCheckout()">
             <i class="fas fa-credit-card"></i>
             Proceed to Checkout
-          </button>
+          </button> -->
         </div>
       </div>
     </div>
 
+  </div>
+
+  <!-- Seller Details Modal -->
+  <div class="modal-overlay" *ngIf="showSellerModal" (click)="closeSellerModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>
+          <i class="fas fa-user-circle"></i>
+          Seller Information
+        </h3>
+        <button class="close-btn" (click)="closeSellerModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Loading State -->
+        <div class="loading-state" *ngIf="loadingSeller">
+          <div class="spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+          <p>Loading seller information...</p>
+        </div>
+        
+        <!-- Error State -->
+        <div class="error-state" *ngIf="sellerError && !loadingSeller">
+          <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>{{ sellerError }}</p>
+          </div>
+        </div>
+        
+        <!-- Seller Details -->
+        <div class="seller-details" *ngIf="selectedSeller && !loadingSeller">
+          <div class="seller-info-grid">
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-user"></i>
+                <span>Seller Name</span>
+              </div>
+              <div class="info-value">{{ selectedSeller.name }}</div>
+            </div>
+            
+            <div class="info-item">
+              <div class="info-label">
+                <i class="fas fa-envelope"></i>
+                <span>Email</span>
+              </div>
+              <div class="info-value">
+                <a [href]="'mailto:' + selectedSeller.email" class="email-link">
+                  {{ selectedSeller.email }}
+                </a>
+              </div>
+            </div>
+            
+            <div class="info-item" *ngIf="selectedSeller.contact || selectedSeller.phoneNumber">
+              <div class="info-label">
+                <i class="fas fa-phone"></i>
+                <span>Contact Number</span>
+              </div>
+              <div class="info-value">
+                <a [href]="'tel:' + (selectedSeller.contact || selectedSeller.phoneNumber)" class="phone-link">
+                  {{ selectedSeller.contact || selectedSeller.phoneNumber }}
+                </a>
+              </div>
+            </div>
+            
+            <div class="info-item" *ngIf="selectedSeller.location">
+              <div class="info-label">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Location</span>
+              </div>
+              <div class="info-value">{{ selectedSeller.location }}</div>
+            </div>
+            
+            <div class="info-item" *ngIf="selectedSeller.address">
+              <div class="info-label">
+                <i class="fas fa-home"></i>
+                <span>Address</span>
+              </div>
+              <div class="info-value">{{ selectedSeller.address }}</div>
+            </div>
+          </div>
+          
+          <div class="contact-actions">
+            <button class="btn-outline" (click)="closeSellerModal()">
+              <i class="fas fa-times"></i>
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

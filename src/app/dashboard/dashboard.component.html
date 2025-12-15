@@ -2,34 +2,37 @@
   <!-- Sidebar -->
   <aside class="dashboard-sidebar">
     <div class="sidebar-header">
-      <img src="assets/images/logo.png" alt="SnapCart Logo" class="logo">
+      <img src="logo.png" alt="SnapCart Logo" class="logo">
       <h3>Dashboard</h3>
     </div>
     <nav class="sidebar-nav">
-      <a href="#" routerLink="/dashboard/dashboard-home" class="nav-item active">
+      <a routerLink="/dashboard/dashboard-home" 
+         class="nav-item" 
+         routerLinkActive="active" 
+         [routerLinkActiveOptions]="{exact: false}"
+         (click)="setActiveTab('overview')">
         <i class="fas fa-home"></i>
         <span>Overview</span>
+        <div class="active-indicator" *ngIf="activeTab === 'overview'"></div>
       </a>
-      <a href="#" routerLink="/dashboard/product-listings" class="nav-item">
+      <a routerLink="/dashboard/product-listings" 
+         class="nav-item" 
+         routerLinkActive="active" 
+         [routerLinkActiveOptions]="{exact: false}"
+         (click)="setActiveTab('products')">
         <i class="fas fa-box"></i>
         <span>Products</span>
+        <div class="active-indicator" *ngIf="activeTab === 'products'"></div>
       </a>
-      <a href="#" class="nav-item">
-        <i class="fas fa-shopping-cart"></i>
-        <span>Orders</span>
-      </a>
-      <a href="#" class="nav-item">
-        <i class="fas fa-users"></i>
-        <span>Customers</span>
-      </a>
-      <a href="#" class="nav-item">
-        <i class="fas fa-chart-bar"></i>
-        <span>Analytics</span>
-      </a>
-      <a href="#" class="nav-item">
+     
+      <!-- <a href="#" 
+         class="nav-item" 
+         [class.active]="activeTab === 'settings'"
+         (click)="setActiveTab('settings')">
         <i class="fas fa-cog"></i>
         <span>Settings</span>
-      </a>
+        <div class="active-indicator" *ngIf="activeTab === 'settings'"></div>
+      </a> -->
     </nav>
     
   </aside>

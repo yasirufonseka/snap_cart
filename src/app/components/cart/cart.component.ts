@@ -1,8 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { CartService, Cart, CartItem } from '../../services/cart.service';
 import { CookieHandlerService } from '../../services/cookie.handle';
+
+interface SellerInfo {
+  id: string;
+  name: string;
+  email: string;
+  contact?: string;
+  phoneNumber?: string; // Keep for backward compatibility
+  location?: string;
+  address?: string;
+}
 
 @Component({
   selector: 'app-cart',
@@ -22,10 +33,17 @@ export class CartComponent implements OnInit {
   
   loading = false;
   userId: string | null = null;
+  
+  // Seller modal properties
+  showSellerModal = false;
+  selectedSeller: SellerInfo | null = null;
+  loadingSeller = false;
+  sellerError = '';
 
   constructor(
     private cartService: CartService,
-    private cookieService: CookieHandlerService
+    private cookieService: CookieHandlerService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -160,5 +178,52 @@ export class CartComponent implements OnInit {
 
   trackByProductId(index: number, item: CartItem): string {
     return item.productId;
+  }
+
+  // Seller Details Methods
+  viewSellerDetails(item: CartItem): void {
+    console.log('Viewing seller details for product:', item.productName);
+    
+    if (!item.sellerId) {
+      alert('Seller information not available for this product.');
+      return;
+    }
+    
+    this.loadingSeller = true;
+    this.sellerError = '';
+    this.showSellerModal = true;
+    
+    // Fetch seller details from backend
+    this.http.get<SellerInfo>(`http://localhost:8080/api/GetUser/${item.sellerId}`)
+      .subscribe({
+        next: (seller) => {
+          console.log('Seller details loaded:', seller);
+          this.selectedSeller = seller;
+          this.loadingSeller = false;
+        },
+        error: (error) => {
+          console.error('Error loading seller details:', error);
+          this.sellerError = 'Failed to load seller information. Please try again.';
+          this.loadingSeller = false;
+          
+          // Fallback seller info
+          this.selectedSeller = {
+            id: item.sellerId || 'N/A',
+            name: 'Seller Information',
+            email: 'contact@snapcart.com',
+            contact: '+1-234-567-8900',
+            phoneNumber: '+1-234-567-8900',
+            location: 'Available on request',
+            address: 'Contact seller for details'
+          };
+        }
+      });
+  }
+
+  closeSellerModal(): void {
+    this.showSellerModal = false;
+    this.selectedSeller = null;
+    this.sellerError = '';
+    this.loadingSeller = false;
   }
 }

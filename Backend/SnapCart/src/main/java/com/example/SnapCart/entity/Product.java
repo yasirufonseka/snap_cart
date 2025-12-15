@@ -11,7 +11,6 @@ import java.util.List;
 
 @Document(collection = "products")
 @Getter @Setter
-@NoArgsConstructor
 @AllArgsConstructor
 
 public class Product {
@@ -34,7 +33,15 @@ public class Product {
   private double price;
   private double discount;
   private String sellerId;
-  private String status;
+  private String sellerName;
+  private String status; // pending, approved, declined
+  private String declineReason;
+  private java.time.LocalDateTime createdAt;
+  private java.time.LocalDateTime approvedAt;
 
+  public Product() {
+    this.status = "pending";
+    this.createdAt = java.time.LocalDateTime.now();
+  }
 
 }

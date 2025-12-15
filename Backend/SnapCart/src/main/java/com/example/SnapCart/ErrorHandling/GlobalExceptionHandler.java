@@ -41,16 +41,11 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(BadRequestException.class)
-  public ResponseEntity<Map<String, Object>> handleBadRequest(MethodArgumentNotValidException e){
-      Map<String,Object> errors = new HashMap<>();
-      e.getBindingResult().getAllErrors().forEach((error) -> {
-        String fieldName = ((FieldError) error).getField();
-        String errorMessage = error.getDefaultMessage();
-        errors.put(fieldName, errorMessage);
-
-
-      });
-    return ResponseEntity.status(500).body(errors);
+  public ResponseEntity<Map<String, Object>> handleBadRequest(BadRequestException ex){
+      Map<String, Object> response = new HashMap<>();
+      response.put("error", "Bad request: " + ex.getMessage());
+      response.put("status", "BAD_REQUEST");
+      return ResponseEntity.badRequest().body(response);
   }
 
 }

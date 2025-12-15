@@ -3,7 +3,6 @@ package com.example.SnapCart.dto;
 
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,5 +34,8 @@ public class UserRegiRequest {
 
     @NotBlank
     private String address;
+
+    @NotBlank
+    private String role = "seller"; // Default role
 
 }

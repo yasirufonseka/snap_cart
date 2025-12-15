@@ -1,0 +1,853 @@
+<div class="admin-dashboard">
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>SnapCart Admin</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <button 
+        class="nav-item" 
+        [class.active]="activeView === 'overview'"
+        (click)="setActiveView('overview')">
+        <i class="fas fa-chart-line"></i>
+        <span>Overview</span>
+      </button>
+      <button 
+        class="nav-item" 
+        [class.active]="activeView === 'products'"
+        (click)="setActiveView('products')">
+        <i class="fas fa-box"></i>
+        <span>Products</span>
+        <span class="badge" *ngIf="pendingProducts.length > 0">{{ pendingProducts.length }}</span>
+      </button>
+      <button 
+        class="nav-item" 
+        [class.active]="activeView === 'users'"
+        (click)="setActiveView('users')">
+        <i class="fas fa-users"></i>
+        <span>Users</span>
+      </button>
+      
+      <button 
+        class="nav-item" 
+        [class.active]="activeView === 'settings'"
+        (click)="setActiveView('settings')">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </button>
+    </nav>
+    
+    <!-- Logout Button -->
+    <div class="sidebar-footer">
+      <button class="logout-btn " (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Overview Section -->
+    <div class="overview-section" *ngIf="activeView === 'overview'">
+      <div class="section-header">
+        <h1>Dashboard Overview</h1>
+        <p>Welcome to your admin dashboard</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid" *ngIf="dashboardStats">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-number">{{ dashboardStats.totalProducts }}</span>
+            <span class="stat-label">Total Products</span>
+            
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-number">{{ dashboardStats.totalUsers }}</span>
+            <span class="stat-label">Active Users</span>
+            
+          </div>
+        </div>
+        <!-- <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-number">${{ dashboardStats.totalSales | number }}</span>
+            <span class="stat-label">Total Sales</span>
+            <span class="stat-change negative">-2.4%</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-number">{{ dashboardStats.totalReviews }}</span>
+            <span class="stat-label">Reviews</span>
+            <span class="stat-change positive">+5.7%</span>
+          </div>
+        </div> -->
+      </div>
+
+      <!-- Charts Section -->
+      <div class="charts-section">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3>Daily Product Additions</h3>
+            <div class="chart-filters">
+              <!-- <button class="filter-btn">Weekly</button> -->
+              <button class="filter-btn active">Monthly</button>
+              <!-- <button class="filter-btn">Yearly</button> -->
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas #productChart width="400" height="200"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="products-section" *ngIf="activeView === 'products'">
+      <div class="section-header">
+        <h1>Product Management</h1>
+        <p>Manage product approvals and listings</p>
+      </div>
+
+      <!-- Product Navigation Tabs -->
+      <div class="nav-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'pending'"
+          (click)="setActiveTab('pending')">
+          <i class="fas fa-clock"></i>
+          Pending Products
+          <span class="badge" *ngIf="pendingProducts.length > 0">{{ pendingProducts.length }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'approved'"
+          (click)="setActiveTab('approved')">
+          <i class="fas fa-check-circle"></i>
+          Approved Products
+          <span class="badge" *ngIf="approvedProducts.length > 0">{{ approvedProducts.length }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeTab === 'declined'"
+          (click)="setActiveTab('declined')">
+          <i class="fas fa-times-circle"></i>
+          Declined Products
+          <span class="badge" *ngIf="declinedProducts.length > 0">{{ declinedProducts.length }}</span>
+        </button>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-container">
+        <div class="loading-spinner" *ngIf="isLoading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Loading products...</p>
+        </div>
+
+        <div class="products-grid" *ngIf="!isLoading">
+          <div 
+            class="product-card" 
+            *ngFor="let product of filteredProducts"
+            (click)="viewProduct(product)">
+            <div class="product-image">
+              <img [src]="product.images[0]" [alt]="product.name" />
+              <div class="image-count" *ngIf="product.images.length > 1">
+                <i class="fas fa-images"></i>
+                {{ product.images.length }}
+              </div>
+            </div>
+            <div class="product-info">
+              <h3>{{ product.name }}</h3>
+              <p class="product-description">{{ product.description }}</p>
+              
+              <!-- Basic Info -->
+              <div class="product-meta">
+                <span class="price">LKR.{{ product.price }}</span>
+                <span class="discount" *ngIf="product.discount">({{ product.discount }}% off)</span>
+                <span class="category">{{ product.category }}</span>
+              </div>
+              
+              <!-- Product Details -->
+              <div class="product-details">
+                <div class="detail-row" *ngIf="product._id">
+                  <span class="label">ID:</span>
+                  <span class="value">{{ product._id }}</span>
+                </div>
+                <div class="detail-row" *ngIf="product.collection">
+                  <span class="label">Collection:</span>
+                  <span class="value">{{ product.collection }}</span>
+                </div>
+                <div class="detail-row" *ngIf="product.items">
+                  <span class="label">Items:</span>
+                  <span class="value">{{ product.items }}</span>
+                </div>
+                <div class="detail-row" *ngIf="product.brand">
+                  <span class="label">Brand:</span>
+                  <span class="value">{{ product.brand }}</span>
+                </div>
+                <!-- <div class="detail-row" *ngIf="product.condition">
+                  <span class="label">Condition:</span>
+                  <span class="value">{{ product.condition }}</span>
+                </div>
+                <div class="detail-row" *ngIf="product.serialNo">
+                  <span class="label">Serial No:</span>
+                  <span class="value">{{ product.serialNo }}</span>
+                </div>
+                <div class="detail-row" *ngIf="product.colour">
+                  <span class="label">Color:</span>
+                  <span class="value">{{ product.colour }}</span>
+                </div>
+                <div class="detail-row" *ngIf="product.size">
+                  <span class="label">Size:</span>
+                  <span class="value">{{ product.size }}</span>
+                </div>
+                <div class="detail-row" *ngIf="product.city">
+                  <span class="label">City:</span>
+                  <span class="value">{{ product.city }}</span>
+                </div> -->
+             
+              </div>
+              <div class="product-actions " >
+               <button class="btn btn-sm btn-outline-danger action-btn" *ngIf="product.status === 'approved' || product.status === 'declined' || product.status === 'pending' "
+                      (click)="deleteProduct(product)" title="Delete Product">
+                Delete Product
+              </button>
+            </div>
+              
+              <!-- Seller Info -->
+              <div class="seller-info">
+                <i class="fas fa-store"></i>
+                <span>{{ product.sellerName }}</span>
+                <span class="seller-id" *ngIf="product.sellerId">(ID: {{ product.sellerId }})</span>
+              </div>
+              
+              <!-- Created Date -->
+              <div class="created-date">
+                <i class="fas fa-calendar"></i>
+                <span>{{ product.createdAt | date:'short' }}</span>
+              </div>
+            </div>
+            <div class="product-status">
+              <span class="status-badge" [class]="product.status">
+                {{ product.status | titlecase }}
+              </span>
+
+           
+            </div>
+           
+          </div>
+
+          <div class="empty-state" *ngIf="filteredProducts.length === 0">
+            <i class="fas fa-inbox"></i>
+            <h3>No {{ activeTab }} products</h3>
+            <p>There are no {{ activeTab }} products at the moment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Section -->
+    <div class="users-section" *ngIf="activeView === 'users'">
+      <div class="section-header">
+        <h1>User Management</h1>
+        <p>Manage users, roles, and permissions</p>
+      </div>
+
+      <!-- User Navigation Tabs -->
+      <div class="nav-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="activeUserTab === 'all'"
+          (click)="setActiveUserTab('all')">
+          <i class="fas fa-users"></i>
+          All Users
+          <span class="badge">{{ allUsers.length }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeUserTab === 'customers'"
+          (click)="setActiveUserTab('customers')">
+          <i class="fas fa-user"></i>
+          Customers
+          <span class="badge">{{ getCustomersCount() }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeUserTab === 'sellers'"
+          (click)="setActiveUserTab('sellers')">
+          <i class="fas fa-store"></i>
+          Sellers
+          <span class="badge">{{ getSellersCount() }}</span>
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeUserTab === 'active'"
+          (click)="setActiveUserTab('active')">
+          <i class="fas fa-check-circle"></i>
+          Active Users
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeUserTab === 'inactive'"
+          (click)="setActiveUserTab('inactive')">
+          <i class="fas fa-ban"></i>
+          Inactive Users
+        </button>
+      </div>
+
+      <!-- Users Grid -->
+      <div class="users-container">
+        <div class="users-grid" *ngIf="!isLoading">
+          <div 
+            class="user-card" 
+            *ngFor="let user of filteredUsers"
+            (click)="viewUser(user)">
+            <div class="user-avatar">
+              <img [src]="user.profileImage || '/api/placeholder/50/50'" [alt]="user.username" />
+              <div class="user-status" [class.active]="user.isActive"></div>
+            </div>
+            <div class="user-info">
+              <h3>{{ user.username }}</h3>
+              <p class="user-email">{{ user.email }}</p>
+              <div class="user-meta">
+                <span class="role-badge" [class]="user.role">{{ user.role | titlecase }}</span>
+                <span class="join-date">
+                  <i class="fas fa-calendar"></i>
+                  {{ user.createdAt | date:'short' }}
+                </span>
+              </div>
+            </div>
+            <div class="user-actions">
+              <button 
+                class="action-btn" 
+                [class.active]="user.isActive"
+                (click)="$event.stopPropagation(); toggleUserStatus(user.id)"
+                [title]="user.isActive ? 'Deactivate User' : 'Activate User'">
+                <i class="fas" [class.fa-toggle-on]="user.isActive" [class.fa-toggle-off]="!user.isActive"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="filteredUsers.length === 0">
+            <i class="fas fa-users"></i>
+            <h3>No {{ activeUserTab }} users</h3>
+            <p>There are no {{ activeUserTab }} users at the moment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Other Sections (Placeholder) -->
+    <div class="other-section" *ngIf="activeView === 'orders'">
+      <div class="section-header">
+        <h1>Order Management</h1>
+        <p>View and manage customer orders</p>
+      </div>
+      <div class="coming-soon">
+        <i class="fas fa-shopping-cart"></i>
+        <h3>Coming Soon</h3>
+        <p>Order management features will be available soon.</p>
+      </div>
+    </div>
+
+    <div class="other-section" *ngIf="activeView === 'analytics'">
+      <div class="section-header">
+        <h1>Analytics</h1>
+        <p>View detailed analytics and reports</p>
+      </div>
+      <div class="coming-soon">
+        <i class="fas fa-chart-bar"></i>
+        <h3>Coming Soon</h3>
+        <p>Advanced analytics features will be available soon.</p>
+      </div>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="settings-section" *ngIf="activeView === 'settings'">
+      <div class="section-header">
+        <h1>Settings</h1>
+        <p>Manage your account settings and preferences</p>
+      </div>
+
+      <!-- Settings Navigation Tabs -->
+      <div class="nav-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="activeSettingsTab === 'profile'"
+          (click)="setActiveSettingsTab('profile')">
+          <i class="fas fa-user"></i>
+          Profile Settings
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeSettingsTab === 'security'"
+          (click)="setActiveSettingsTab('security')">
+          <i class="fas fa-shield-alt"></i>
+          Security
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeSettingsTab === 'preferences'"
+          (click)="setActiveSettingsTab('preferences')">
+          <i class="fas fa-cog"></i>
+          Preferences
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="activeSettingsTab === 'system'"
+          (click)="setActiveSettingsTab('system')">
+          <i class="fas fa-server"></i>
+          System
+        </button>
+      </div>
+
+      <!-- Profile Settings Tab -->
+      <div class="settings-content" *ngIf="activeSettingsTab === 'profile'">
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Profile Information</h3>
+            <p>Update your personal information and contact details</p>
+          </div>
+          
+          <div class="profile-section">
+            <div class="profile-avatar">
+              <img [src]="currentUser.profileImage" [alt]="currentUser.name" />
+              <button class="change-avatar-btn">
+                <i class="fas fa-camera"></i>
+                Change Photo
+              </button>
+            </div>
+            
+            <div class="profile-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="name">Full Name</label>
+                  <input 
+                    type="text" 
+                    id="name" 
+                    [(ngModel)]="profileForm.name" 
+                    class="form-control"
+                    placeholder="Enter your full name" />
+                </div>
+                <div class="form-group">
+                  <label for="username">Username</label>
+                  <input 
+                    type="text" 
+                    id="username" 
+                    [(ngModel)]="profileForm.username" 
+                    class="form-control"
+                    placeholder="Enter username" />
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="email">Email Address</label>
+                  <input 
+                    type="email" 
+                    id="email" 
+                    [(ngModel)]="profileForm.email" 
+                    class="form-control"
+                    placeholder="Enter email address" />
+                </div>
+                <div class="form-group">
+                  <label for="contact">Contact Number</label>
+                  <input 
+                    type="tel" 
+                    id="contact" 
+                    [(ngModel)]="profileForm.contact" 
+                    class="form-control"
+                    placeholder="Enter contact number" />
+                </div>
+              </div>
+              
+              <div class="form-actions">
+                <button 
+                  class="btn btn-primary" 
+                  (click)="updateProfile()"
+                  [disabled]="isUpdatingProfile">
+                  <i class="fas fa-spinner fa-spin" *ngIf="isUpdatingProfile"></i>
+                  <i class="fas fa-save" *ngIf="!isUpdatingProfile"></i>
+                  {{ isUpdatingProfile ? 'Updating...' : 'Update Profile' }}
+                </button>
+                <button 
+                  class="btn btn-secondary" 
+                  (click)="resetProfileForm()"
+                  [disabled]="isUpdatingProfile">
+                  <i class="fas fa-undo"></i>
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Settings Tab -->
+      <div class="settings-content" *ngIf="activeSettingsTab === 'security'">
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Change Password</h3>
+            <p>Update your password to keep your account secure</p>
+          </div>
+          
+          <div class="password-form">
+            <div class="form-group">
+              <label for="currentPassword">Current Password</label>
+              <input 
+                type="password" 
+                id="currentPassword" 
+                [(ngModel)]="passwordForm.currentPassword" 
+                class="form-control"
+                placeholder="Enter current password" />
+            </div>
+            
+            <div class="form-group">
+              <label for="newPassword">New Password</label>
+              <input 
+                type="password" 
+                id="newPassword" 
+                [(ngModel)]="passwordForm.newPassword" 
+                class="form-control"
+                placeholder="Enter new password" />
+              <small class="form-text">Password must be at least 6 characters long</small>
+            </div>
+            
+            <div class="form-group">
+              <label for="confirmPassword">Confirm New Password</label>
+              <input 
+                type="password" 
+                id="confirmPassword" 
+                [(ngModel)]="passwordForm.confirmPassword" 
+                class="form-control"
+                placeholder="Confirm new password" />
+            </div>
+            
+            <div class="form-actions">
+              <button 
+                class="btn btn-primary" 
+                (click)="updatePassword()"
+                [disabled]="isUpdatingPassword">
+                <i class="fas fa-spinner fa-spin" *ngIf="isUpdatingPassword"></i>
+                <i class="fas fa-lock" *ngIf="!isUpdatingPassword"></i>
+                {{ isUpdatingPassword ? 'Updating...' : 'Update Password' }}
+              </button>
+              <button 
+                class="btn btn-secondary" 
+                (click)="resetPasswordForm()"
+                [disabled]="isUpdatingPassword">
+                <i class="fas fa-times"></i>
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        
+      </div>
+
+      <!-- Preferences Tab -->
+      <div class="settings-content" *ngIf="activeSettingsTab === 'preferences'">
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>Display Preferences</h3>
+            <p>Customize your dashboard appearance and behavior</p>
+          </div>
+          
+          <div class="preferences-grid">
+            <div class="preference-item">
+              <div class="preference-info">
+                <h4>Theme</h4>
+                <p>Choose your preferred color scheme</p>
+              </div>
+              <select class="form-control">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="auto">Auto</option>
+              </select>
+            </div>
+            
+            <div class="preference-item">
+              <div class="preference-info">
+                <h4>Language</h4>
+                <p>Select your preferred language</p>
+              </div>
+              <select class="form-control">
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+              </select>
+            </div>
+            
+            <div class="preference-item">
+              <div class="preference-info">
+                <h4>Notifications</h4>
+                <p>Control email and push notifications</p>
+              </div>
+              <div class="toggle-switch">
+                <input type="checkbox" id="notifications" checked>
+                <label for="notifications"></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Tab -->
+      <div class="settings-content" *ngIf="activeSettingsTab === 'system'">
+        <div class="settings-card">
+          <div class="card-header">
+            <h3>System Information</h3>
+            <p>View system details and maintenance options</p>
+          </div>
+          
+          <div class="system-info">
+            <div class="info-row">
+              <label>System Version:</label>
+              <span>SnapCart Admin v2.1.0</span>
+            </div>
+            <div class="info-row">
+              <label>Database Status:</label>
+              <span class="status-badge active">Connected</span>
+            </div>
+            <div class="info-row">
+              <label>Last Update:</label>
+              <span>{{ currentDate | date:'medium' }}</span>
+            </div>
+            <div class="info-row">
+              <label>Server Status:</label>
+              <span class="status-badge active">Online</span>
+            </div>
+          </div>
+          
+          <div class="system-actions">
+            <button class="btn btn-outline">
+              <i class="fas fa-download"></i>
+              Export Data
+            </button>
+            <button class="btn btn-outline">
+              <i class="fas fa-sync"></i>
+              Clear Cache
+            </button>
+            <button class="btn btn-outline">
+              <i class="fas fa-file-alt"></i>
+              View Logs
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loading-spinner" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Loading...</p>
+    </div>
+  </div>
+
+  <!-- Product Detail Modal -->
+  <div class="modal-overlay" *ngIf="selectedProduct" (click)="closeProductView()">
+    <div class="product-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Product Review</h2>
+        <button class="close-btn" (click)="closeProductView()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-content">
+        <div class="product-images">
+          <div class="main-image">
+            <img [src]="selectedProduct.images[selectedImageIndex]" [alt]="selectedProduct.name" />
+          </div>
+          <div class="image-thumbnails" *ngIf="selectedProduct.images.length > 1">
+            <img 
+              *ngFor="let image of selectedProduct.images; let i = index"
+              [src]="image" 
+              [alt]="selectedProduct.name"
+              [class.active]="i === selectedImageIndex"
+              (click)="selectImage(i)" />
+          </div>
+        </div>
+
+        <div class="product-details">
+          <div class="detail-section">
+            <h3>{{ selectedProduct.name }}</h3>
+            <p class="description">{{ selectedProduct.description }}</p>
+          </div>
+
+          <div class="detail-section">
+            <div class="detail-row" *ngIf="selectedProduct._id">
+              <label>Product ID:</label>
+              <span>{{ selectedProduct._id }}</span>
+            </div>
+            <div class="detail-row">
+              <label>Price:</label>
+              <span class="price">LKR.{{ selectedProduct.price }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedProduct.discount">
+              <label>Discount:</label>
+              <span>{{ selectedProduct.discount }}%</span>
+            </div>
+            <!-- <div class="detail-row">
+              <label>Category:</label>
+              <span>{{ selectedProduct.category }}</span>
+            </div> -->
+            <div class="detail-row" *ngIf="selectedProduct.collection">
+              <label>Collection:</label>
+              <span>{{ selectedProduct.collection }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedProduct.items">
+              <label>Items:</label>
+              <span>{{ selectedProduct.items }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedProduct.brand">
+              <label>Brand:</label>
+              <span>{{ selectedProduct.brand }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedProduct.condition">
+              <label>Condition:</label>
+              <span>{{ selectedProduct.condition }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedProduct.serialNo">
+              <label>Serial No:</label>
+              <span>{{ selectedProduct.serialNo }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedProduct.colour">
+              <label>Color:</label>
+              <span>{{ selectedProduct.colour }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedProduct.size">
+              <label>Size:</label>
+              <span>{{ selectedProduct.size }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedProduct.city">
+              <label>City:</label>
+              <span>{{ selectedProduct.city }}</span>
+            </div>
+            <div class="detail-row">
+              <label>Seller:</label>
+              <span>{{ selectedProduct.sellerName }}</span>
+            </div>
+            <div class="detail-row" *ngIf="selectedProduct.sellerId">
+              <label>Seller ID:</label>
+              <span>{{ selectedProduct.sellerId }}</span>
+            </div>
+            <div class="detail-row">
+              <label>Submitted:</label>
+              <span>{{ selectedProduct.createdAt | date:'medium' }}</span>
+            </div>
+            <div class="detail-row">
+              <label>Status:</label>
+              <span class="status-badge" [class]="selectedProduct.status">
+                {{ selectedProduct.status | titlecase }}
+              </span>
+            </div>
+          </div>
+
+          <div class="action-buttons" *ngIf="selectedProduct.status === 'pending'">
+            <button 
+              class="btn btn-approve" 
+              (click)="approveProduct(selectedProduct.id)"
+              [disabled]="isLoading">
+              <i class="fas fa-check"></i>
+              Approve Product
+            </button>
+            <button 
+              class="btn btn-decline" 
+              (click)="declineProduct(selectedProduct.id)"
+              [disabled]="isLoading">
+              <i class="fas fa-times"></i>
+              Decline Product
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Detail Modal -->
+  <div class="modal-overlay" *ngIf="selectedUser" (click)="closeUserView()">
+    <div class="user-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>User Details</h2>
+        <button class="close-btn" (click)="closeUserView()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-content">
+        <div class="user-profile">
+          <div class="profile-image">
+            <img [src]="selectedUser.profileImage || '/api/placeholder/100/100'" [alt]="selectedUser.username" />
+            <div class="status-indicator" [class.active]="selectedUser.isActive">
+              <i class="fas" [class.fa-check-circle]="selectedUser.isActive" [class.fa-times-circle]="!selectedUser.isActive"></i>
+            </div>
+          </div>
+          
+          <div class="user-details">
+            <div class="detail-section">
+              <h3>{{ selectedUser.username }}</h3>
+              <p class="user-email">{{ selectedUser.email }}</p>
+              <span class="role-badge" [class]="selectedUser.role">{{ selectedUser.role | titlecase }}</span>
+            </div>
+
+            <div class="detail-section">
+              <div class="detail-row">
+                <label>User ID:</label>
+                <span>{{ selectedUser.id }}</span>
+              </div>
+              <div class="detail-row">
+                <label>Status:</label>
+                <span class="status-badge" [class.active]="selectedUser.isActive">
+                  {{ selectedUser.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+              <div class="detail-row">
+                <label>Role:</label>
+                <span>{{ selectedUser.role | titlecase }}</span>
+              </div>
+              <div class="detail-row">
+                <label>Joined:</label>
+                <span>{{ selectedUser.createdAt | date:'medium' }}</span>
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              <button 
+                class="btn" 
+                [class.btn-activate]="!selectedUser.isActive"
+                [class.btn-deactivate]="selectedUser.isActive"
+                (click)="toggleUserStatus(selectedUser.id)"
+                [disabled]="isLoading">
+                <i class="fas" [class.fa-check]="!selectedUser.isActive" [class.fa-ban]="selectedUser.isActive"></i>
+                {{ selectedUser.isActive ? 'Deactivate' : 'Activate' }} User
+              </button>
+              <button 
+                class="btn btn-danger" 
+                (click)="deleteUser(selectedUser.id)"
+                [disabled]="isLoading || selectedUser.role === 'admin'">
+                <i class="fas fa-trash"></i>
+                Delete User
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -18,4 +18,20 @@ public interface ProductService {
   double getTotalSalesBySeller(String sellerId);
   List<Product> getAllProducts();
   List<Product> getRecentProductsBySeller(String sellerId, int limit);
+  Product deleteProduct(String id);
+  
+  // Admin methods
+  List<Product> getProductsByStatus(String status);
+  Product approveProduct(String productId);
+  Product declineProduct(String productId, String reason);
+  List<Product> getProductsBySellerId(String sellerId);
+  List<Product> getProductsBySellerIdAndStatus(String sellerId, String status);
+  long getTotalProductsCount();
+  
+  // Dashboard statistics methods
+  java.util.List<java.util.Map<String, Object>> getDailyProductStats(int days);
+  java.util.List<java.util.Map<String, Object>> getDailyUserRegistrationStats(int days);
+  
+  // Search methods
+  List<Product> searchProducts(String query);
 }

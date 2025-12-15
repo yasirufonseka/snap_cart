@@ -6,10 +6,46 @@
       <span class="product-count">{{products.length}} Products</span>
     </div>
     <div class="header-actions">
-      <button class="btn btn-primary" routerLink="/seller/add-product">
+      <button class="btn btn-primary" routerLink="/seller">
         <i class="fas fa-plus"></i> Add New Product
       </button>
     </div>
+  </div>
+
+  <!-- Approval Status Tabs -->
+  <div class="approval-tabs">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeApprovalTab === 'all'"
+      (click)="setActiveApprovalTab('all')">
+      <i class="fas fa-list"></i>
+      All Products
+      <span class="badge">{{ products.length }}</span>
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeApprovalTab === 'pending'"
+      (click)="setActiveApprovalTab('pending')">
+      <i class="fas fa-clock"></i>
+      Pending Review
+      <span class="badge badge-warning" *ngIf="approvalStats.pending > 0">{{ approvalStats.pending }}</span>
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeApprovalTab === 'approved'"
+      (click)="setActiveApprovalTab('approved')">
+      <i class="fas fa-check-circle"></i>
+      Approved
+      <span class="badge badge-success" *ngIf="approvalStats.approved > 0">{{ approvalStats.approved }}</span>
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeApprovalTab === 'declined'"
+      (click)="setActiveApprovalTab('declined')">
+      <i class="fas fa-times-circle"></i>
+      Declined
+      <span class="badge badge-danger" *ngIf="approvalStats.declined > 0">{{ approvalStats.declined }}</span>
+    </button>
   </div>
 
   <!-- Filters and Controls -->
@@ -34,15 +70,14 @@
           <option value="">All Categories</option>
           <option value="men">Men's Wear</option>
           <option value="women">Women's Wear</option>
-          <option value="kids">Kids Wear</option>
-          <option value="sports">Sports Wear</option>
+          
         </select>
       </div>
 
       <div class="dropdown status-filter">
         <select class="form-select" [(ngModel)]="selectedStatus" (change)="filterProducts()">
           <option value="">All Status</option>
-          <option value="available">Available</option>
+          <option value="approved">Approved</option>
           <option value="sold">Sold</option>
           <option value="draft">Draft</option>
         </select>
@@ -70,18 +105,18 @@
 
   <!-- Products Grid View -->
   <div class="products-grid" *ngIf="viewMode === 'grid'">
-    <div class="product-card" *ngFor="let product of filteredProducts">
+    <div class="product-card" *ngFor="let product of filteredProductsByApproval">
       <div class="product-image">
         <img [src]="product.images[0]" [alt]="product.brand">
-        <div class="product-status" [class]="product.status">
-          {{product.status}}
+        <div class="product-status" [class]="getStatusBadgeClass(product.status)">
+          {{ getStatusText(product.status) }}
         </div>
       </div>
       <div class="product-info">
         <h3>{{product.brand}} - {{product.items}}</h3>
         <p class="product-description">{{product.description}}</p>
         <div class="product-details">
-          <span class="price">${{product.price}}</span>
+          <span class="price">LKR.{{product.price}}</span>
           <span class="discount" *ngIf="product.discount > 0">-{{product.discount}}%</span>
         </div>
         <div class="product-metadata">
@@ -90,14 +125,28 @@
         </div>
       </div>
       <div class="product-actions">
-        <button class="btn btn-outline-primary" *ngIf="product.status === 'available'"
+        <div class="decline-reason" *ngIf="product.status === 'declined' && product.declineReason">
+          <small class="text-danger">
+            <i class="fas fa-exclamation-triangle"></i> 
+            Decline Reason: {{ product.declineReason }}
+          </small>
+        </div>
+        
+        <!-- Debug info (remove after testing) -->
+        <small class="text-muted d-block mb-1">Status: "{{ product.status }}"</small>
+        
+        <button class="btn btn-outline-primary" *ngIf="product.status === 'approved'"
                 (click)="markAsSold(product)">
           <i class="fas fa-check"></i> Mark as Sold
         </button>
-        <button class="btn btn-outline-secondary" [routerLink]="['/product-edit', product.id]" >
+        <button class="btn btn-outline-secondary" [routerLink]="['/product-edit', product.id]" 
+                *ngIf="canEditProduct(product)"
+                title="Edit Product (Status: {{ product.status }})">
           <i class="fas fa-edit"></i> Edit
         </button>
-        <button class="btn btn-outline-danger" (click)="deleteProduct(product)">
+        <button class="btn btn-outline-danger" (click)="deleteProduct(product)"
+                *ngIf="canDeleteProduct(product)"
+                title="Delete Product (Status: {{ product.status }})">
           <i class="fas fa-trash"></i> Delete
         </button>
       </div>
@@ -118,7 +167,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let product of filteredProducts">
+        <tr *ngFor="let product of filteredProductsByApproval">
           <td class="product-cell">
             <img [src]="product.images[0]" [alt]="product.brand">
             <div class="product-cell-info">
@@ -129,24 +178,29 @@
           <td>{{product.collection}}</td>
           <td>
             <div class="price-cell">
-              <span class="current-price">${{product.price}}</span>
+              <span class="current-price">LKR.{{product.price}}</span>
               <span class="discount" *ngIf="product.discount > 0">-{{product.discount}}%</span>
             </div>
           </td>
           <td>
-            <span class="status-badge" [class]="product.status">{{product.status}}</span>
+            <span class="status-badge" [class]="getStatusBadgeClass(product.status)">{{ getStatusText(product.status) }}</span>
+            <div *ngIf="product.status === 'declined' && product.declineReason" class="decline-reason-small">
+              <small class="text-danger">{{ product.declineReason }}</small>
+            </div>
           </td>
           <td>{{product.city}}</td>
           <td>
             <div class="table-actions">
-              <button class="btn btn-sm btn-outline-primary" *ngIf="product.status === 'available'"
-                      (click)="markAsSold(product)">
+              <button class="btn btn-sm btn-outline-primary" *ngIf="product.status === 'approved'"
+                      (click)="markAsSold(product)" title="Mark as Sold">
                 <i class="fas fa-check"></i>
               </button>
-              <button class="btn btn-sm btn-outline-secondary" (click)="editProduct(product.id)">
+              <button class="btn btn-sm btn-outline-secondary" *ngIf="canEditProduct(product)"
+                      (click)="editProduct(product.id)" title="Edit Product">
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(product.id)">
+              <button class="btn btn-sm btn-outline-danger" *ngIf="canDeleteProduct(product)"
+                      (click)="deleteProduct(product)" title="Delete Product">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
@@ -157,7 +211,7 @@
   </div>
 
   <!-- Empty State -->
-  <div class="empty-state" *ngIf="filteredProducts.length === 0">
+  <div class="empty-state" *ngIf="filteredProductsByApproval.length === 0">
     <div class="empty-state-content">
       <i class="fas fa-box-open"></i>
       <h3>No Products Found</h3>
