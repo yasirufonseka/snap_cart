@@ -1,3 +1,6 @@
+import { HttpClient } from "@angular/common/http";
+import { Product } from "../models/product.model";
+
 export class ProductService {
     private apiUrl = 'http://localhost:8080/api/products';
 

@@ -1,5 +1,14 @@
-export class ProductEditComponent {
-  product: any; // Replace 'any' with the appropriate product model type
+import { Component, OnInit } from '@angular/core';
+import { ProductService } from '../../services/product.service';
+
+@Component({
+  selector: 'app-product-edit',
+  templateUrl: './product-edit.component.html',
+  styleUrls: ['./product-edit.component.scss'],
+  standalone: true,
+})
+export class ProductEditComponent implements OnInit {
+  product: any; 
 
   constructor(private productService: ProductService) {}
 

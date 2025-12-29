@@ -1,4 +1,12 @@
-export class DashboardComponent {
+import { Component, OnInit } from '@angular/core';
+import { ProductService } from '../../services/product.service';
+
+@Component({
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
+})
+export class DashboardComponent implements OnInit {
   products: any[] = [];
 
   constructor(private productService: ProductService) {}
@@ -8,7 +16,7 @@ export class DashboardComponent {
   }
 
   initializeData() {
-    this.productService.getProducts().subscribe((data) => {
+    this.productService.fetchProducts().subscribe((data) => {
       this.products = data;
     });
   }
