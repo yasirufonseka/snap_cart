@@ -1,4 +1,4 @@
-# SnapCart - Malinda Project
+# SnapCart 
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.6.
 
@@ -57,3 +57,8 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+<img width="480" height="1054" alt="1766030044725" src="https://github.com/user-attachments/assets/cee91305-7742-4380-9e3f-f72a3e17f730" />
+<img width="1280" height="676" alt="1766030044805" src="https://github.com/user-attachments/assets/76fa507f-254a-43fb-8423-9e4eedda57e6" />
+
+
